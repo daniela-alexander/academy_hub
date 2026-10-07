@@ -1,0 +1,81 @@
+PROYECTO: Academy Hub
+SESIÓN: 02
+FASE: Diseño técnico y configuración
+FECHA: 07/10/2026
+HORA DE ENTRADA: 16:00
+HORA DE SALIDA: 18:15
+DURACIÓN: 2.15 hs
+
+OBJETIVO:
+Profesionalizar la estructura del proyecto, separar configuración por entornos
+y preparar el sistema de usuarios.
+
+TEORÍA ESTUDIADA:
+- Arquitectura de software
+- Separación de responsabilidades
+- Entornos
+- Variables de entorno
+- Gestión de secretos
+- AbstractUser
+- Custom User
+- AUTH_USER_MODEL
+- Template inheritance
+- Logging
+- Testing
+
+TAREAS REALIZADAS:
+- Reorganización settings
+- Development settings
+- Testing settings
+- Production settings
+- Creación .env
+- Creación .env.example
+- Configuración SECRET_KEY
+- Configuración idioma
+- Configuración timezone
+- Custom User
+- Migraciones
+- Django Admin
+- Template base
+- Logging inicial
+- Tests iniciales
+
+TECNOLOGÍAS:
+Python
+Django
+SQLite
+python-dotenv
+Git
+HTML
+
+ARCHIVOS PRINCIPALES:
+config/settings/base.py
+config/settings/development.py
+config/settings/testing.py
+config/settings/production.py
+accounts/models.py
+accounts/admin.py
+templates/base.html
+core/tests.py
+accounts/tests.py
+.env
+.env.example
+
+TESTS EJECUTADOS:
+python manage.py check
+python manage.py test
+
+PROBLEMAS ENCONTRADOS:
+SOLUCIONES:
+
+COMMIT:
+refactor: organize settings and add custom user foundation
+
+ESTADO:
+[ ] Pendiente
+[ ] En progreso
+[X] Completada
+
+PRÓXIMA SESIÓN:
+Sistema de usuarios: registro de academia y alumno, login, logout,
+perfil, edición de perfil, avatar, permisos y validaciones.

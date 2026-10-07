@@ -1,0 +1,68 @@
+PROYECTO: Academy Hub
+SESIÓN: 01
+FASE: Análisis, planificación y configuración inicial
+FECHA: 06/10/2026
+HORA DE ENTRADA: 16:30
+HORA DE SALIDA: 19:00
+DURACIÓN: 3.30 horas 
+
+OBJETIVO: Definir el proyecto Academy Hub y preparar una base Django funcional.
+
+TEORÍA ESTUDIADA:
+- Ciclo de desarrollo
+- Requisitos
+- Historias de usuario
+- MVP
+- Django Project vs App
+- URL / View / Template
+- Static / Media
+- Migraciones
+- Git
+
+TAREAS REALIZADAS:
+- Definición de Academy Hub
+- Objetivos
+- Requisitos
+- Historias de usuario
+- Entorno virtual
+- Instalación Django
+- Proyecto Django
+- Apps
+- Templates
+- Static
+- Media
+- Página principal
+- Admin
+- Git
+
+TECNOLOGÍAS:
+Python
+Django
+SQLite
+Git
+HTML
+
+ARCHIVOS IMPORTANTES:
+config/settings.py
+config/urls.py
+core/views.py
+core/urls.py
+templates/core/home.html
+.gitignore
+requirements.txt
+
+TESTS / COMPROBACIONES:
+python manage.py check
+python manage.py migrate
+python manage.py runserver
+
+PROBLEMAS: ninguno
+SOLUCIONES: 
+
+COMMIT: feat: initialize Academy Hub Django project
+
+ESTADO: [ ] Pendiente [ ] En progreso [X] Completada
+
+OBSERVACIONES:
+
+SIGUIENTE SESIÓN: Arquitectura profesional, configuración, variables de entorno y preparación del sistema de usuarios (academias y alumnos).
