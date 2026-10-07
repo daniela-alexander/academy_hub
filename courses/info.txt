@@ -1,0 +1,5 @@
+Aquí gestionaremos cursos, categorías y Convocatorias
+
+- CRUD de los cursos
+- Convocatorias de los cursos
+- Categorías

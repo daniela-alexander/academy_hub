@@ -1,0 +1,7 @@
+Aquí gestionaremos a los usuarios, academias y alumnos
+
+- registro de academia
+- registro de alumno
+- login
+- perfil
+- permisos
