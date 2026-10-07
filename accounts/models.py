@@ -10,9 +10,37 @@ class User(AbstractUser):
         blank=True
     )
 
+    avatar = models.ImageField(
+        upload_to="avatars/",
+        blank=True,
+        null=True
+    )
+
     phone = models.CharField(
         max_length=20,
         blank=True,
+    )
+
+    bio = models.TextField(
+        max_length=500,
+        blank=True,
+    )
+
+    is_verified =models.BooleanField(
+        default=False,
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
+
+    birth_date = models.DateField(
+    blank=True,
+    null=True,
     )
 
     def __str__(self):
