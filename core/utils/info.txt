@@ -1,0 +1,5 @@
+Aquí se pueden ir guardadno utilidades PEQUEÑAS que se puedan reutilizar.
+Por ejemplo:
+- generación de nombres de archivo
+- helpers de fechas
+- funciones de fechas

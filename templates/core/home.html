@@ -1,20 +1,12 @@
-<!DOCTYPE html>
-<html lang="es">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Academy Hub</title>
-</head>
+{% block title %}Inicio | Academy Hub{% endblock %}
 
-<body>
-    <header>
-        <h1>Academy Hub</h1>
-    </header>
-    <main>
-        <h2>Formación conectada con tus objetivos</h2>
-        <p>Descubre cursos, comprueba si encajan contigo y gestiona tu matrícula.</p>
-    </main>
-</body>
+{% block content %}
+<h2>Academy Hub</h2>
 
-</html>
+<p>
+    Descubre cursos, comprueba si encajan con tu objetivo profesional
+    y reserva tu plaza en un solo lugar.
+</p>
+{% endblock %}
