@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>
         {% block title %}
-        Tech2Hand
+        Academy Hub
         {% endblock %}
     </title>
 </head>
@@ -15,11 +15,37 @@
     <header>
         <nav>
             <a href="{% url 'core:home' %}">
-                Tech2Hand
+                Academy Hub
             </a>
+            {% if user.is_authenticated %}
+            <a href="{% url 'accounts:profile' %}">
+                Mi perfil
+            </a>
+            <form method="post" action="{% url 'accounts:logout' %}">
+                {% csrf_token %}
+                <button type="submit">
+                    Cerrar sesión
+                </button>
+            </form>
+            {% else %}
+            <a href="{% url 'accounts:login' %}">
+                Login
+            </a>
+            <a href="{% url 'accounts:register' %}">
+                Registro
+            </a>
+            {% endif %}
         </nav>
     </header>
     <main>
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
         {% block content %}
         {% endblock %}
     </main>

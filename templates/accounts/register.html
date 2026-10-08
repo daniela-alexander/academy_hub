@@ -1,0 +1,17 @@
+{%extends "base.html" %}
+
+{% block title %}
+    Registro | Academy Hub
+{% endblock %}
+
+{%block content %}
+    <h1>Crear cuenta</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Registrarme</button>
+    </form>
+
+    <p>¿Ya tienes una cuenta? <a href="{% url 'accounts:login' %}">Inicia sesión</a></p>
+
+{% endblock %}

@@ -1,0 +1,38 @@
+{%extends "base.html"%}
+
+{% block title %}
+Mi perfil | Academy Hub
+{% endblock %}
+
+{% block content %}
+<h1>Mi perfil</h1>
+{%if user.avatar %}
+    <img src="{{ user.avatar.url }}" alt="Avatar de {{ user.username }}" width="150">
+{%endif%}
+
+<p>
+    <strong>Usuario:</strong> {{ user.username }}
+</p>
+<p>
+    <strong>Nombre:</strong> {{ user.first_name }} {{ user.last_name }}
+</p>
+
+<p>
+    <strong>Email:</strong> {{ user.email }}
+</p>
+
+<p>
+    <strong>Ciudad:</strong> {{user.city|default:"Sin especificar"}}
+</p>
+
+<p>
+    <strong>Biografía:</strong> {{user.bio|default:"Sin biografía"}}
+</p>
+
+<p>
+    <strong>Miembro desde:</strong> {{user.created_at}}
+</p>
+
+<a href="{% url 'accounts:profile_edit' %}" class="btn btn-primary">Editar perfil</a>
+
+{% endblock %}
