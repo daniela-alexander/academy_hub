@@ -1,11 +1,11 @@
-from django.db import models
+﻿from django.db import models
 from django.utils.text import slugify
 from django.core.validators import MinValueValidator
 
 
 class Category(models.Model):
     """
-    Categoría de curso (Idiomas, Informática, Oposiciones...).
+    Categor├¡a de curso (Idiomas, Inform├ítica, Oposiciones...).
     """
 
     name = models.CharField(
@@ -23,7 +23,7 @@ class Category(models.Model):
 
     description = models.TextField(
         blank=True,
-        verbose_name="Descripción",
+        verbose_name="Descripci├│n",
     )
 
     icon = models.CharField(
@@ -40,12 +40,12 @@ class Category(models.Model):
 
     created_at = models.DateTimeField(
         auto_now_add=True,
-        verbose_name="Fecha de creación",
+        verbose_name="Fecha de creaci├│n",
     )
 
     class Meta:
-        verbose_name = "Categoría"
-        verbose_name_plural = "Categorías"
+        verbose_name = "Categor├¡a"
+        verbose_name_plural = "Categor├¡as"
         ordering = ["name"]
 
     def save(self, *args, **kwargs):
@@ -57,7 +57,7 @@ class Category(models.Model):
         return self.name
 
 class CourseLevel(models.TextChoices):
-    BEGINNER = "beginner", "Básico"
+    BEGINNER = "beginner", "B├ísico"
     INTERMEDIATE = "intermediate", "Intermedio"
     ADVANCED = "advanced", "Avanzado"
     EXPERT = "expert", "Experto"
@@ -66,7 +66,7 @@ class CourseLevel(models.TextChoices):
 class CourseModality(models.TextChoices):
     PRESENCIAL = "presencial", "Presencial"
     ONLINE = "online", "Online"
-    HYBRID = "hybrid", "Híbrida"
+    HYBRID = "hybrid", "H├¡brida"
 
 
 class CourseStatus(models.TextChoices):
@@ -76,8 +76,8 @@ class CourseStatus(models.TextChoices):
 
 
 class EnrollmentMode(models.TextChoices):
-    DIRECT = "direct", "Inscripción directa"
-    APPROVAL = "approval", "Admisión previa"
+    DIRECT = "direct", "Inscripci├│n directa"
+    APPROVAL = "approval", "Admisi├│n previa"
 
 
 class Course(models.Model):
@@ -96,7 +96,7 @@ class Course(models.Model):
         Category,
         on_delete=models.PROTECT,
         related_name="courses",
-        verbose_name="Categoría",
+        verbose_name="Categor├¡a",
     )
 
     teacher = models.ForeignKey(
@@ -110,7 +110,7 @@ class Course(models.Model):
 
     title = models.CharField(
         max_length=180,
-        verbose_name="Título",
+        verbose_name="T├¡tulo",
     )
 
     slug = models.SlugField(
@@ -120,7 +120,7 @@ class Course(models.Model):
     )
 
     description = models.TextField(
-        verbose_name="Descripción",
+        verbose_name="Descripci├│n",
     )
 
     objectives = models.TextField(
@@ -164,7 +164,7 @@ class Course(models.Model):
         max_length=20,
         choices=EnrollmentMode.choices,
         default=EnrollmentMode.DIRECT,
-        verbose_name="Modo de inscripción",
+        verbose_name="Modo de inscripci├│n",
     )
 
     requires_level_test = models.BooleanField(
@@ -179,7 +179,7 @@ class Course(models.Model):
 
     duration_hours = models.PositiveIntegerField(
         default=0,
-        verbose_name="Duración (horas)",
+        verbose_name="Duraci├│n (horas)",
     )
 
     views_count = models.PositiveIntegerField(
@@ -189,12 +189,12 @@ class Course(models.Model):
 
     created_at = models.DateTimeField(
         auto_now_add=True,
-        verbose_name="Fecha de creación",
+        verbose_name="Fecha de creaci├│n",
     )
 
     updated_at = models.DateTimeField(
         auto_now=True,
-        verbose_name="Última actualización",
+        verbose_name="├Ültima actualizaci├│n",
     )
 
     class Meta:
@@ -233,6 +233,139 @@ class Course(models.Model):
     def has_convocatorias(self):
         return self.convocatorias.filter(is_active=True).exists()
 
+
+        return self.status == CourseStatus.PUBLISHED
+  --@property
+> --def has_convocatorias(self):
+> --    return self.convocatorias.filter(is_active=True).exists()
+  ++    @property
+> ++    def has_convocatorias(self):
+> ++        return self.convocatorias.filter(is_active=True).exists()
+  ++
+  ++
+  ++class CourseModality(models.TextChoices):
+  ++    PRESENCIAL = "presencial", "Presencial"
+  ++    ONLINE = "online", "Online"
+  ++    HYBRID = "hybrid", "H├¡brida"
+  ++
+  ++
+> ++class Convocatoria(models.Model):
+  ++    course = models.ForeignKey(
+  ++        Course,
+  ++        on_delete=models.CASCADE,
+> ++        related_name="convocatorias",
+  ++        verbose_name="Curso",
+  ++    )
+  ++    name = models.CharField(
+  ++        max_length=150,
+  ++        blank=True,
+  ++        verbose_name="Nombre",
+  ++        help_text="Ej: Verano 2026, Grupo A, Ma├▒anas",
+  ++    )
+  ++    start_date = models.DateField()
+  ++    enrollment_deadline = models.DateField(
+  ++        null=True,
+  ++        blank=True,
+  ++        verbose_name="Fecha l├¡mite de inscripci├│n",
+  ++    )
+  ++    schedule = models.CharField(
+  ++        max_length=200,
+  ++        blank=True,
+  ++        verbose_name="Horario",
+  ++        help_text="Ej: L-X-V 18:00-20:00",
+  ++    )
+  ++    modality = models.CharField(
+  ++        max_length=20,
+  ++        choices=CourseModality.choices,
+  ++        default=CourseModality.PRESENCIAL,
+  ++        verbose_name="Modalidad",
+  ++    )
+  ++    location = models.CharField(
+  ++        max_length=200,
+  ++        blank=True,
+  ++        verbose_name="Ubicaci├│n",
+  ++    )
+  ++    price = models.DecimalField(
+  ++        max_digits=10,
+  ++        decimal_places=2,
+  ++        validators=[MinValueValidator(0)],
+  ++        verbose_name="Precio",
+  ++    )
+  ++    deposit = models.DecimalField(
+  ++        max_digits=10,
+  ++        decimal_places=2,
+  ++        default=0,
+  ++        validators=[MinValueValidator(0)],
+  ++        verbose_name="Se├▒al / Reserva",
+  ++        help_text="Cantidad a pagar para reservar plaza",
+  ++    )
+  ++    total_places = models.PositiveIntegerField(
+  ++        default=0,
+  ++        verbose_name="Plazas totales",
+  ++    )
+  ++    reserved_places = models.PositiveIntegerField(
+  ++        default=0,
+  ++        verbose_name="Plazas reservadas",
+  ++    )
+  ++    enrolled_places = models.PositiveIntegerField(
+  ++        default=0,
+  ++        verbose_name="Plazas matriculadas",
+  ++    )
+  ++    is_active = models.BooleanField(
+  ++        default=True,
+  ++        verbose_name="Activa",
+  ++    )
+  ++    created_at = models.DateTimeField(
+  ++        auto_now_add=True,
+  ++        verbose_name="Fecha de creaci├│n",
+  ++    )
+  ++    updated_at = models.DateTimeField(
+  ++        auto_now=True,
+  ++        verbose_name="├Ültima actualizaci├│n",
+  ++    )
+  ++
+  ++    class Meta:
+> ++        verbose_name = "Convocatoria"
+> ++        verbose_name_plural = "Convocatorias"
+  ++        ordering = ["start_date"]
+  ++        indexes = [
+  ++            models.Index(fields=["start_date"]),
+  ++            models.Index(fields=["is_active"]),
+  ++            models.Index(fields=["course"]),
+  ++        ]
+  ++
+  ++    def __str__(self):
+  ++        label = self.name or f"{self.start_date}"
+  ++        return f"{self.course.title} ÔÇö {label}"
+  ++
+  ++    @property
+  ++    def available_places(self):
+  ++        used = self.reserved_places + self.enrolled_places
+  ++        return max(self.total_places - used, 0)
+  ++
+  ++    @property
+  ++    def is_full(self):
+  ++        return self.available_places == 0
+  ++
+  ++    @property
+  ++    def is_open(self):
+  ++        from django.utils import timezone
+  ++
+  ++        if not self.is_active or self.is_full:
+  ++            return False
+  ++        if (
+  ++            self.enrollment_deadline
+  ++            and timezone.localdate() > self.enrollment_deadline
+  ++        ):
+  ++            return False
+  ++        return True
+    
+    class CourseImage(models.Model):
+        """
+
+
+
+
 class CourseImage(models.Model):
     """
     Imagen asociada a un curso.
@@ -263,17 +396,17 @@ class CourseImage(models.Model):
 
     position = models.PositiveSmallIntegerField(
         default=0,
-        verbose_name="Posición",
+        verbose_name="Posici├│n",
     )
 
     created_at = models.DateTimeField(
         auto_now_add=True,
-        verbose_name="Fecha de creación",
+        verbose_name="Fecha de creaci├│n",
     )
 
     class Meta:
         verbose_name = "Imagen de curso"
-        verbose_name_plural = "Imágenes de curso"
+        verbose_name_plural = "Im├ígenes de curso"
         ordering = ["position", "created_at"]
         indexes = [
             models.Index(fields=["course", "is_primary"]),
