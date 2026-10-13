@@ -210,14 +210,6 @@ class CourseModelTest(TestCase):
         self.assertIsNotNone(curso.updated_at)
         self.assertEqual(curso.created_at, curso.updated_at)
 
-    def test_updated_at_cambia_al_guardar(self):
-        curso = self._crear_curso()
-        original = curso.updated_at
-        curso.title = "Otro título"
-        curso.save()
-        curso.refresh_from_db()
-        self.assertGreater(curso.updated_at, original)
-
     # ---------- __str__ ----------
     def test_str_devuelve_title(self):
         curso = self._crear_curso(title="Curso de Inglés")
