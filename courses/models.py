@@ -1,7 +1,7 @@
 ﻿from django.db import models
 from django.utils.text import slugify
 from django.core.validators import MinValueValidator
-
+from django.urls import reverse
 
 class Category(models.Model):
     """
@@ -218,6 +218,12 @@ class Course(models.Model):
 
     def __str__(self):
         return self.title
+
+    def get_absolute_url(self):
+        return reverse(
+            "courses:detail",
+            kwargs={"pk": self.pk, "slug": self.slug},
+        )
 
     @property
     def primary_image(self):
