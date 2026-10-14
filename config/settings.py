@@ -42,6 +42,13 @@ INSTALLED_APPS = [
     'accounts',
     'academies',
     'courses',
+    'enrollments',
+    'payments',
+    'notifications',
+    'evaluations',
+    'talent',
+    'api',
+    'ai',
 ]
 
 MIDDLEWARE = [

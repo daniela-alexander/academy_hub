@@ -1,4 +1,7 @@
 from django.shortcuts import render
+<<<<<<< HEAD
+import logging
+=======
 from django.contrib import messages
 from django.contrib.auth.mixins import (
     LoginRequiredMixin,
@@ -16,10 +19,17 @@ from django.views.generic import (
 from .forms import ContactMessageForm
 from .models import ContactMessage
 
+>>>>>>> main
 
+logger = logging.getLogger(__name__)
 
 def home(request):
+<<<<<<< HEAD
+    logger.info("Home page requested")
+    return render(request, 'core/home.html')
+=======
     return render(request, "core/home.html")
+>>>>>>> main
 
 def about(request):
     return render(request, "core/about.html")
