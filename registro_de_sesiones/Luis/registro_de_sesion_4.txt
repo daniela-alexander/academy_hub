@@ -1,0 +1,106 @@
+PROYECTO: Academy Hub
+SESIÓN: 04
+FASE: Desarrollo del núcleo de la plataforma
+TEMA: Modelos de dominio de todas las apps
+FECHA: 13/10/2026
+HORA DE ENTRADA: 17:00
+HORA DE SALIDA: 18:00
+DURACIÓN: 1 hora
+
+RESPONSABLE: Luis Robert Huertas Araya
+
+OBJETIVO:
+Diseñar e implementar el modelo de datos completo de Academy Hub,
+cubriendo las entidades base del sistema.
+
+TEORÍA ESTUDIADA:
+- Model
+- ForeignKey
+- on_delete (CASCADE, PROTECT, SET_NULL)
+- related_name
+- TextChoices
+- DecimalField
+- SlugField
+- ImageField
+- validators
+- Meta: ordering, indexes, constraints
+- AbstractUser y Custom User
+- AUTH_USER_MODEL
+- Migraciones
+- Django ORM básico
+
+MODELOS IMPLEMENTADOS:
+- accounts.User         → AbstractUser extendido con roles (is_academy, is_student),
+                          avatar, city, bio, phone, is_verified, birth_date
+- academies.Academy     → owner (User), name, slug, description, city, address,
+                          website, phone, email, logo, is_verified, is_active
+- academies.Teacher     → academy (Academy), first_name, last_name, email, phone,
+                          specialty, bio, photo, is_active
+- core.ContactMessage   → name, email, subject, message, is_read, created_at
+
+DECISIONES DE DISEÑO:
+- Uso de AbstractUser para conservar el sistema de autenticación de Django.
+- email único a nivel de modelo en User.
+- Custom User configurado antes de generar migraciones para evitar conflictos futuros.
+- Academy.owner con CASCADE: si desaparece el usuario, sus academias también.
+- Teacher.academy con CASCADE: los profesores dependen de su academia.
+- ContactMessage sin relaciones: entidad independiente para el formulario de contacto.
+- Slugs autogenerados en save() con slugify().
+- Índices en campos de filtrado frecuente (city, is_active, is_verified).
+
+ARCHIVOS CREADOS:
+accounts/models.py
+academies/models.py
+core/models.py
+
+ARCHIVOS MODIFICADOS:
+config/settings/base.py  → AUTH_USER_MODEL = "accounts.User"
+                        → LOCAL_APPS con core, accounts, academies
+
+MIGRACIONES:
+accounts/migrations/0001_initial.py
+academies/migrations/0001_initial.py
+core/migrations/0001_initial.py
+
+TESTS:
+- creación de User (academy / student / staff)
+- email único
+- creación de Academy
+- slug autogenerado
+- creación de Teacher
+- relación Academy → Teacher
+- creación de ContactMessage
+- representación __str__ de cada modelo
+
+COMANDOS:
+python manage.py makemigrations accounts
+python manage.py makemigrations academies
+python manage.py makemigrations core
+python manage.py migrate
+python manage.py check
+python manage.py test
+
+PROBLEMAS:
+- Conflicto inicial con AUTH_USER_MODEL tras haber migrado con el User estándar.
+- `verbose_name` incorrecto en varios campos (copiados entre sí).
+- Import duplicado en core/models.py.
+
+SOLUCIONES:
+- Reset de la base de datos en desarrollo y regeneración de migraciones.
+- Corrección manual de los verbose_name.
+- Limpieza de imports duplicados.
+
+COMMIT:
+feat: add User, Academy, Teacher and ContactMessage models
+
+ESTADO:
+[X] Completada
+
+OBSERVACIONES:
+Esta sesión sienta las bases del modelo de datos. La app courses
+(Category, Course, Convocatoria, CourseImage) y la app enrollments
+(Enrollment, WaitlistEntry, EnrollmentAnswer, EnrollmentDocument)
+se cubren en la misma sesión por otras personas del equipo.
+
+PRÓXIMA SESIÓN:
+CRUD completo de cursos y resto de entidades de la plataforma.
