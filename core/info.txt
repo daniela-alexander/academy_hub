@@ -1,0 +1,5 @@
+Aquí encontraremos las funcionalidades/páginas generales:
+
+- home
+- páginas informativas
+- utilidades comunes

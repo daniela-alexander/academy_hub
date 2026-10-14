@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Cursos{% endblock %}
+
+{% block content %}
+<h1>Cursos</h1>
+
+{% if courses %}
+<div class="course-grid">
+    {% for course in courses %}
+    <article class="course-card">
+        {% if course.primary_image %}
+        <img src="{{ course.primary_image.image.url }}" alt="{{ course.primary_image.alt_text|default:course.title }}">
+        {% endif %}
+        <h2>
+            <a href="{{ course.get_absolute_url }}">{{ course.title }}</a>
+        </h2>
+        <p>{{ course.description|truncatewords:20 }}</p>
+        <p>
+            <strong>Academia:</strong> {{ course.academy.name }}<br>
+            <strong>Categoría:</strong> {{ course.category.name }}<br>
+            <strong>Nivel:</strong> {{ course.get_level_display }}<br>
+            <strong>Modalidad:</strong> {{ course.get_modality_display }}
+        </p>
+    </article>
+    {% endfor %}
+</div>
+
+{% if is_paginated %}
+<nav class="pagination">
+    {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+    {% endif %}
+    <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+    {% endif %}
+</nav>
+{% endif %}
+{% else %}
+<p>No hay cursos publicados todavía.</p>
+{% endif %}
+{% endblock %}

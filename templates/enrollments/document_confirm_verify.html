@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Verificar documento{% endblock %}
+
+{% block content %}
+<h1>Verificar documento</h1>
+<p>¿Verificar el documento «{{ object.name }}» de «{{ object.enrollment.student }}»?</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Sí, verificar</button>
+    <a href="{% url 'enrollments:detail' object.enrollment.pk %}">Volver</a>
+</form>
+{% endblock %}

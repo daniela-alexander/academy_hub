@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Rechazar inscripción{% endblock %}
+
+{% block content %}
+<h1>Rechazar inscripción</h1>
+<p>¿Rechazar la inscripción de «{{ object.student }}» en «{{ object.convocatoria.course.title }}»?</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Sí, rechazar</button>
+    <a href="{% url 'enrollments:academy_list' %}">Volver</a>
+</form>
+{% endblock %}

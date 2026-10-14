@@ -1,3 +1,7 @@
-from .base import * 
+import os
+from .base import *
 
-DEBUG = True
+DEBUG = os.getenv(
+    "DJANGO_DEBUG",
+    "True"
+).lower() == "true"

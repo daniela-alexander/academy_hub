@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Inscribirse{% endblock %}
+
+{% block content %}
+<h1>Inscribirse en {{ convocatoria.course.title }}</h1>
+
+<p>
+    <strong>Convocatoria:</strong> {{ convocatoria.name|default:convocatoria.start_date }}<br>
+    <strong>Fechas:</strong> {{ convocatoria.start_date }} a {{ convocatoria.end_date }}<br>
+    <strong>Precio:</strong> {{ convocatoria.price }} €<br>
+    <strong>Plazas disponibles:</strong> {{ convocatoria.available_places }}
+</p>
+
+{% if convocatoria.is_full %}
+<p><em>La convocatoria está llena. Al enviar, entrarás en lista de espera.</em></p>
+{% endif %}
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Confirmar inscripción</button>
+</form>
+{% endblock %}

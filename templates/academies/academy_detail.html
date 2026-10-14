@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}{{ academy.name }}{% endblock %}
+
+{% block content %}
+<article class="academy-detail">
+    <h1>{{ academy.name }}</h1>
+
+    {% if academy.logo %}
+    <img src="{{ academy.logo.url }}" alt="{{ academy.name }}">
+    {% endif %}
+
+    <p>{{ academy.description }}</p>
+
+    <p>
+        <strong>Ciudad:</strong> {{ academy.city }}<br>
+        <strong>Dirección:</strong> {{ academy.address }}<br>
+        <strong>Web:</strong> {{ academy.website }}<br>
+        <strong>Teléfono:</strong> {{ academy.phone }}<br>
+        <strong>Email:</strong> {{ academy.email }}
+    </p>
+
+    {% if user.is_authenticated and user == academy.owner %}
+    <p>
+        <a href="{% url 'academies:update' academy.slug %}">Editar</a>
+        | <a href="{% url 'academies:delete' academy.slug %}">Eliminar</a>
+        | <a href="{% url 'academies:teacher_create' academy.pk %}">Añadir profesor</a>
+    </p>
+    {% endif %}
+
+    <section>
+        <h2>Profesores</h2>
+        {% if academy.teachers.all %}
+        <ul>
+            {% for teacher in academy.teachers.all %}
+            <li>
+                <a href="{% url 'academies:teacher_detail' teacher.pk %}">
+                    {{ teacher.first_name }} {{ teacher.last_name }}
+                </a>
+                {% if teacher.specialty %}— {{ teacher.specialty }}{% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>No hay profesores registrados.</p>
+        {% endif %}
+    </section>
+
+    <section>
+        <h2>Cursos</h2>
+        {% if academy.courses.all %}
+        <ul>
+            {% for course in academy.courses.all %}
+            <li><a href="{{ course.get_absolute_url }}">{{ course.title }}</a></li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>No hay cursos publicados.</p>
+        {% endif %}
+    </section>
+</article>
+{% endblock %}

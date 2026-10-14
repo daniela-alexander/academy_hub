@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Editar mensaje{% endblock %}
+
+{% block content %}
+<h1>Editar mensaje</h1>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Guardar</button>
+    <a href="{% url 'core:contact_message_detail' object.pk %}">Cancelar</a>
+</form>
+{% endblock %}

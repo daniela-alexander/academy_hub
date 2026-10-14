@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Mensajes de contacto{% endblock %}
+
+{% block content %}
+<h1>Mensajes de contacto</h1>
+
+{% if messages_list %}
+<table>
+    <thead>
+        <tr>
+            <th>Fecha</th>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Asunto</th>
+            <th>Leído</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for msg in messages_list %}
+        <tr>
+            <td>{{ msg.created_at|date:"d/m/Y H:i" }}</td>
+            <td>{{ msg.name }}</td>
+            <td>{{ msg.email }}</td>
+            <td>{{ msg.subject }}</td>
+            <td>{% if msg.is_read %}Sí{% else %}No{% endif %}</td>
+            <td>
+                <a href="{% url 'core:contact_message_detail' msg.pk %}">Ver</a>
+                | <a href="{% url 'core:contact_message_update' msg.pk %}">Editar</a>
+                | <a href="{% url 'core:contact_message_delete' msg.pk %}">Eliminar</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% if is_paginated %}
+<nav class="pagination">
+    {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+    {% endif %}
+    <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+    {% endif %}
+</nav>
+{% endif %}
+{% else %}
+<p>No hay mensajes.</p>
+{% endif %}
+{% endblock %}

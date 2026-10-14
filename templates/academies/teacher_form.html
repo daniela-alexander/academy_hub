@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}{% if object %}Editar profesor{% else %}Añadir profesor{% endif %}{% endblock %}
+
+{% block content %}
+<h1>{% if object %}Editar profesor{% else %}Añadir profesor{% endif %}</h1>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Guardar</button>
+    {% if object %}
+    <a href="{% url 'academies:teacher_detail' object.pk %}">Cancelar</a>
+    {% else %}
+    <a href="{% url 'academies:detail' view.kwargs.academy_pk %}">Cancelar</a>
+    {% endif %}
+</form>
+{% endblock %}
