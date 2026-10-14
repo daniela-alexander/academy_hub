@@ -5,7 +5,7 @@ from django.contrib.auth.mixins import (
     LoginRequiredMixin,
     UserPassesTestMixin,
 )
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import (
     CreateView,
@@ -99,15 +99,18 @@ class EnrollmentCreateView(LoginRequiredMixin, CreateView):
             WaitlistEntry.objects.get_or_create(
                 student=self.request.user,
                 convocatoria=self.convocatoria,
-                defaults={"position": WaitlistEntry.objects.filter(
-                    convocatoria=self.convocatoria
-                ).count() + 1},
+                defaults={
+                    "position": WaitlistEntry.objects.filter(
+                        convocatoria=self.convocatoria
+                    ).count() + 1,
+                },
             )
             messages.warning(
                 self.request,
                 "La convocatoria está llena. Te hemos añadido a la lista de espera.",
             )
-            return super().form_valid(form)
+            # No creamos Enrollment: redirigimos al listado de inscripciones.
+            return redirect("enrollments:list")
 
         response = super().form_valid(form)
         messages.success(self.request, "Inscripción enviada correctamente.")
