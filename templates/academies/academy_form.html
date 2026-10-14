@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}{% if object %}Editar academia{% else %}Crear academia{% endif %}{% endblock %}
+
+{% block content %}
+<h1>{% if object %}Editar academia{% else %}Crear academia{% endif %}</h1>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Guardar</button>
+    {% if object %}
+    <a href="{% url 'academies:detail' object.slug %}">Cancelar</a>
+    {% else %}
+    <a href="{% url 'academies:list' %}">Cancelar</a>
+    {% endif %}
+</form>
+{% endblock %}

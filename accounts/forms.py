@@ -2,6 +2,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django import forms
 from .models import User
 
+
 class RegisterForm(UserCreationForm):
     class Meta:
         model = User
@@ -72,3 +73,14 @@ class ProfileForm(forms.ModelForm):
             )
     
         return phone
+
+
+
+class UserSearchForm(forms.Form):
+    q = forms.CharField(
+        required=False,
+        label="Buscar",
+        widget=forms.TextInput(
+            attrs={"placeholder": "Buscar por nombre o email"}
+        ),
+    )

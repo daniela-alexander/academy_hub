@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Mensaje de {{ contact_message.name }}{% endblock %}
+
+{% block content %}
+<h1>{{ contact_message.subject }}</h1>
+
+<p>
+    <strong>De:</strong> {{ contact_message.name }} &lt;{{ contact_message.email }}&gt;<br>
+    <strong>Fecha:</strong> {{ contact_message.created_at|date:"d/m/Y H:i" }}<br>
+    <strong>Leído:</strong> {% if contact_message.is_read %}Sí{% else %}No{% endif %}
+</p>
+
+<pre>{{ contact_message.message }}</pre>
+
+<p>
+    <a href="{% url 'core:contact_message_update' contact_message.pk %}">Marcar como leído / editar</a>
+    | <a href="{% url 'core:contact_message_delete' contact_message.pk %}">Eliminar</a>
+    | <a href="{% url 'core:contact_message_list' %}">Volver</a>
+</p>
+{% endblock %}

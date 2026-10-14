@@ -1,11 +1,20 @@
+import logging
+
 from django.contrib import messages
 from django.contrib.auth import login
-from django.shortcuts import redirect, render
+from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
-import logging
+from django.contrib.auth.mixins import (
+    LoginRequiredMixin,
+    UserPassesTestMixin,
+)
+from django.db import models
+from django.shortcuts import redirect, render
+from django.views.generic import DetailView, ListView
 
 from .forms import ProfileForm, RegisterForm
 
+User = get_user_model()
 logger = logging.getLogger(__name__)
 
 def register(request):
@@ -82,3 +91,36 @@ def profile_edit(request):
         "accounts/profile_edit.html",
         {"form": form},
     )
+
+class UserPublicProfileView(DetailView):
+    model = User
+    template_name = "accounts/public_profile.html"
+    context_object_name = "profile_user"
+    slug_field = "username"
+    slug_url_kwarg = "username"
+
+    def get_queryset(self):
+        return User.objects.filter(is_active=True)
+
+
+class StaffRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
+
+    def test_func(self):
+        return self.request.user.is_staff
+
+
+class UserListView(StaffRequiredMixin, ListView):
+    model = User
+    template_name = "accounts/user_list.html"
+    context_object_name = "users"
+    paginate_by = 20
+
+    def get_queryset(self):
+        queryset = User.objects.all().order_by("-created_at")
+        q = self.request.GET.get("q")
+        if q:
+            queryset = queryset.filter(
+                models.Q(username__icontains=q)
+                | models.Q(email__icontains=q)
+            )
+        return queryset

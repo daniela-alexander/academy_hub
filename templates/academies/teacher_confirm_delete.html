@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Eliminar profesor{% endblock %}
+
+{% block content %}
+<h1>Eliminar profesor</h1>
+<p>¿Seguro que quieres eliminar a «{{ object.first_name }} {{ object.last_name }}»?</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Sí, eliminar</button>
+    <a href="{% url 'academies:teacher_detail' object.pk %}">Cancelar</a>
+</form>
+{% endblock %}

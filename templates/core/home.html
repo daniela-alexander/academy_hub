@@ -1,12 +1,16 @@
 {% extends "base.html" %}
 
-{% block title %}Inicio | Academy Hub{% endblock %}
+{% block title %}Academy Hub{% endblock %}
 
 {% block content %}
-<h2>Academy Hub</h2>
+<h1>Academy Hub</h1>
+<p>Formación que encaja contigo.</p>
 
 <p>
-    Descubre cursos, comprueba si encajan con tu objetivo profesional
-    y reserva tu plaza en un solo lugar.
+    <a href="{% url 'courses:list' %}">Ver cursos</a>
+    |
+    <a href="{% url 'academies:list' %}">Ver academias</a>
+    |
+    <a href="{% url 'core:contact' %}">Contacto</a>
 </p>
 {% endblock %}
