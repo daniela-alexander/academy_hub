@@ -157,7 +157,7 @@ class Course(models.Model):
     status = models.CharField(
         max_length=20,
         choices=CourseStatus.choices,
-        default=CourseStatus.DRAFT,
+        default=CourseStatus.PUBLISHED,
         verbose_name="Estado",
     )
 

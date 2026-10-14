@@ -4,6 +4,7 @@ from decimal import Decimal
 from django.contrib.auth import get_user_model
 from django.db import IntegrityError
 from django.utils import timezone
+from django.urls import reverse
 
 from academies.models import Academy
 from core.test_base import VerboseTestCase
@@ -801,3 +802,92 @@ class EnrollmentRelationsTests(EnrollmentBaseTestCase):
             EnrollmentDocument.objects.count(),
             0,
         )
+
+
+class EnrollmentViewTests(EnrollmentBaseTestCase):
+
+    def setUp(self):
+        self.academy_user = User.objects.create_user(
+            username="englishnow",
+            email="info@englishnow.com",
+            password="TestPassword123!",
+            is_academy=True,
+        )
+        self.student = User.objects.create_user(
+            username="laura",
+            email="laura@example.com",
+            password="TestPassword123!",
+            is_student=True,
+        )
+        self.academy = Academy.objects.create(
+            owner=self.academy_user,
+            name="English Now",
+            slug="english-now",
+        )
+        self.category = Category.objects.create(
+            name="Idiomas",
+            slug="idiomas",
+        )
+        self.course = Course.objects.create(
+            academy=self.academy,
+            category=self.category,
+            title="Inglés B2",
+            slug="ingles-b2",
+            description="...",
+        )
+        self.convocatoria = Convocatoria.objects.create(
+            course=self.course,
+            name="Verano",
+            start_date=timezone.now().date() + timedelta(days=30),
+            end_date=timezone.now().date() + timedelta(days=90),
+            price=Decimal("480.00"),
+            total_places=15,
+        )
+
+    def test_student_can_enroll(self):
+        self.client.force_login(self.student)
+        response = self.client.post(
+            reverse("enrollments:create", kwargs={"convocatoria_pk": self.convocatoria.pk}),
+            {},
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Enrollment.objects.count(), 1)
+
+    def test_enrollment_requires_login(self):
+        response = self.client.post(
+            reverse("enrollments:create", kwargs={"convocatoria_pk": self.convocatoria.pk}),
+            {},
+        )
+        self.assertEqual(response.status_code, 302)
+
+    def test_other_user_cannot_see_enrollment(self):
+        other_student = User.objects.create_user(
+            username="carlos",
+            email="carlos@example.com",
+            password="TestPassword123!",
+            is_student=True,
+        )
+        self.client.force_login(self.student)
+        self.client.post(
+            reverse("enrollments:create", kwargs={"convocatoria_pk": self.convocatoria.pk}),
+            {},
+        )
+        enrollment = Enrollment.objects.first()
+        self.client.force_login(other_student)
+        response = self.client.get(reverse("enrollments:detail", kwargs={"pk": enrollment.pk}))
+        self.assertEqual(response.status_code, 403)
+
+    def test_academy_can_approve(self):
+        self.client.force_login(self.student)
+        self.client.post(
+            reverse("enrollments:create", kwargs={"convocatoria_pk": self.convocatoria.pk}),
+            {},
+        )
+        enrollment = Enrollment.objects.first()
+        self.client.force_login(self.academy_user)
+        response = self.client.post(
+            reverse("enrollments:approve", kwargs={"pk": enrollment.pk}),
+            {},
+        )
+        enrollment.refresh_from_db()
+        self.assertEqual(enrollment.status, EnrollmentStatus.APPROVED)

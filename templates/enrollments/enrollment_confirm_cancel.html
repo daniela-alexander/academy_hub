@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Cancelar inscripción{% endblock %}
+
+{% block content %}
+<h1>Cancelar inscripción</h1>
+<p>¿Seguro que quieres cancelar tu inscripción en «{{ object.convocatoria.course.title }}»?</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Sí, cancelar</button>
+    <a href="{% url 'enrollments:detail' object.pk %}">Volver</a>
+</form>
+{% endblock %}

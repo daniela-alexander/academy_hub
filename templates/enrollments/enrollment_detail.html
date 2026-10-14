@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Inscripción #{{ enrollment.pk }}{% endblock %}
+
+{% block content %}
+<h1>Inscripción en {{ enrollment.convocatoria.course.title }}</h1>
+
+<p>
+    <strong>Convocatoria:</strong> {{ enrollment.convocatoria.name|default:enrollment.convocatoria.start_date }}<br>
+    <strong>Fechas:</strong> {{ enrollment.convocatoria.start_date }} a {{ enrollment.convocatoria.end_date }}<br>
+    <strong>Estado:</strong> {{ enrollment.get_status_display }}<br>
+    <strong>Estado de pago:</strong> {{ enrollment.get_payment_status_display }}<br>
+    <strong>Precio:</strong> {{ enrollment.total_price }} €<br>
+    <strong>Pendiente:</strong> {{ enrollment.pending_amount }} €
+</p>
+
+{% if user == enrollment.student %}
+<p>
+    <a href="{% url 'enrollments:answer_create' enrollment.pk %}">Añadir respuesta</a>
+    | <a href="{% url 'enrollments:document_create' enrollment.pk %}">Añadir documento</a>
+    {% if enrollment.is_active %}
+    | <a href="{% url 'enrollments:cancel' enrollment.pk %}">Cancelar inscripción</a>
+    {% endif %}
+</p>
+{% endif %}
+
+<section>
+    <h2>Respuestas</h2>
+    {% if enrollment.answers.all %}
+    <ul>
+        {% for answer in enrollment.answers.all %}
+        <li>
+            <strong>{{ answer.question_text }}</strong><br>
+            {{ answer.answer_text|default:"—" }}
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No hay respuestas.</p>
+    {% endif %}
+</section>
+
+<section>
+    <h2>Documentos</h2>
+    {% if enrollment.documents.all %}
+    <ul>
+        {% for doc in enrollment.documents.all %}
+        <li>
+            <a href="{{ doc.file.url }}">{{ doc.name }}</a>
+            — {% if doc.is_verified %}Verificado{% else %}Pendiente{% endif %}
+            {% if user == enrollment.convocatoria.course.academy.owner and not doc.is_verified %}
+            | <a href="{% url 'enrollments:document_verify' doc.pk %}">Verificar</a>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No hay documentos.</p>
+    {% endif %}
+</section>
+
+<p>
+    <a href="{% url 'enrollments:list' %}">Volver a mis inscripciones</a>
+</p>
+{% endblock %}

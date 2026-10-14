@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}{{ course.title }}{% endblock %}
+
+{% block content %}
+<article class="course-detail">
+    <h1>{{ course.title }}</h1>
+
+    <p>
+        <strong>Academia:</strong>
+        <a href="{% url 'academies:detail' course.academy.slug %}">{{ course.academy.name }}</a><br>
+        <strong>Categoría:</strong> {{ course.category.name }}<br>
+        {% if course.teacher %}
+        <strong>Profesor:</strong> {{ course.teacher }}<br>
+        {% endif %}
+        <strong>Nivel:</strong> {{ course.get_level_display }}<br>
+        <strong>Modalidad:</strong> {{ course.get_modality_display }}<br>
+        <strong>Duración:</strong> {{ course.duration_hours }} horas
+    </p>
+
+    {% if course.images.all %}
+    <div class="course-images">
+        {% for image in course.images.all %}
+        <img src="{{ image.image.url }}" alt="{{ image.alt_text|default:course.title }}">
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <section>
+        <h2>Descripción</h2>
+        <p>{{ course.description }}</p>
+    </section>
+
+    {% if course.objectives %}
+    <section>
+        <h2>Objetivos</h2>
+        <p>{{ course.objectives }}</p>
+    </section>
+    {% endif %}
+
+    {% if course.competences %}
+    <section>
+        <h2>Competencias</h2>
+        <p>{{ course.competences }}</p>
+    </section>
+    {% endif %}
+
+    {% if course.requirements %}
+    <section>
+        <h2>Requisitos</h2>
+        <p>{{ course.requirements }}</p>
+    </section>
+    {% endif %}
+
+    <section>
+        <h2>Convocatorias</h2>
+        {% if course.convocatorias.all %}
+        <ul>
+            {% for conv in course.convocatorias.all %}
+            <li>
+                <strong>{{ conv.name|default:conv.start_date }}</strong>
+                — {{ conv.start_date }} a {{ conv.end_date }}
+                — {{ conv.price }} €
+                — {{ conv.available_places }} plazas disponibles
+                {% if conv.is_open %}
+                <a href="{% url 'enrollments:create' conv.pk %}">Inscribirse</a>
+                {% else %}
+                <em>No disponible</em>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>No hay convocatorias abiertas.</p>
+        {% endif %}
+    </section>
+
+    {% if user.is_authenticated and user == course.academy.owner %}
+    <p>
+        <a href="{% url 'courses:update' course.pk %}">Editar</a>
+        <a href="{% url 'courses:delete' course.pk %}">Eliminar</a>
+        <a href="{% url 'courses:convocatoria_create' course.pk %}">Añadir convocatoria</a>
+        <a href="{% url 'courses:course_image_create' course.pk %}">Añadir imagen</a>
+    </p>
+    {% endif %}
+</article>
+{% endblock %}
