@@ -13,19 +13,30 @@ urlpatterns = [
         "login/", 
         LoginView.as_view(template_name="accounts/login.html",), 
         name="login"),
-        path(
+    path(
             "logout/",
             LogoutView.as_view(),
             name="logout",
         ),
-        path(
+    path(
             "profile/",
             views.profile,
             name="profile"
         ),
-        path(
+    path(
             "profile/edit/",
             views.profile_edit,
             name="profile_edit",
-        )
+        ),
+    path(
+            "users/",
+            views.UserListView.as_view(),
+            name="user_list",
+        ),
+    path(
+            "users/<str:username>/",
+            views.UserPublicProfileView.as_view(),
+            name="public_profile",
+        ),
+
 ]

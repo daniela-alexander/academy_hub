@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Profesores{% endblock %}
+
+{% block content %}
+<h1>Profesores</h1>
+
+{% if teachers %}
+<ul>
+    {% for teacher in teachers %}
+    <li>
+        <a href="{% url 'academies:teacher_detail' teacher.pk %}">
+            {{ teacher.first_name }} {{ teacher.last_name }}
+        </a>
+        — {{ teacher.academy.name }}
+        {% if teacher.specialty %}— {{ teacher.specialty }}{% endif %}
+    </li>
+    {% endfor %}
+</ul>
+
+{% if is_paginated %}
+<nav class="pagination">
+    {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+    {% endif %}
+    <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+    {% endif %}
+</nav>
+{% endif %}
+{% else %}
+<p>No hay profesores registrados.</p>
+{% endif %}
+{% endblock %}

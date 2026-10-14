@@ -3,6 +3,8 @@ from django.contrib.auth import get_user_model
 from django.urls import reverse
 from core.test_base import VerboseTestCase
 
+from .models import Academy
+
 User = get_user_model()
 
 
@@ -244,3 +246,51 @@ class ProfileTests(VerboseTestCase):
             "laura",
         )
 
+class AcademyViewTests(VerboseTestCase):
+
+    def setUp(self):
+        self.owner = User.objects.create_user(
+            username="englishnow",
+            email="info@englishnow.com",
+            password="TestPassword123!",
+            is_academy=True,
+        )
+        self.other = User.objects.create_user(
+            username="codeacademy",
+            email="info@codeacademy.com",
+            password="TestPassword123!",
+            is_academy=True,
+        )
+        self.academy = Academy.objects.create(
+            owner=self.owner,
+            name="English Now",
+            slug="english-now",
+        )
+
+    def test_academy_list_is_public(self):
+        response = self.client.get(reverse("academies:list"))
+        self.assertEqual(response.status_code, 200)
+
+    def test_academy_detail_is_public(self):
+        response = self.client.get(
+            reverse("academies:detail", kwargs={"slug": "english-now"})
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_create_requires_login(self):
+        response = self.client.get(reverse("academies:create"))
+        self.assertEqual(response.status_code, 302)
+
+    def test_other_user_cannot_edit(self):
+        self.client.force_login(self.other)
+        response = self.client.get(
+            reverse("academies:update", kwargs={"slug": "english-now"})
+        )
+        self.assertEqual(response.status_code, 403)
+
+    def test_owner_can_edit(self):
+        self.client.force_login(self.owner)
+        response = self.client.get(
+            reverse("academies:update", kwargs={"slug": "english-now"})
+        )
+        self.assertEqual(response.status_code, 200)
