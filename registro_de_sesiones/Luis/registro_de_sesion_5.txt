@@ -1,0 +1,216 @@
+PROYECTO: Academy Hub
+SESIÓN: 05
+FASE: Desarrollo del núcleo de la plataforma
+TEMA: CRUD completo de las apps core, accounts, courses y enrollments
+FECHA: 14/10/2026
+HORA DE ENTRADA: 16:00
+HORA DE SALIDA: 17:45
+DURACIÓN: 1 hora 45 minutos
+
+RESPONSABLE: Luis Robert Huertas Araya
+
+OBJETIVO:
+Aplicar el patrón CRUD (formularios, vistas CBV, templates y permisos)
+a todas las entidades de las apps core, accounts, courses y enrollments,
+más los templates base compartidos por las 5 apps del proyecto.
+
+TEORÍA ESTUDIADA:
+- CRUD
+- Function Based Views vs Class Based Views
+- ListView, DetailView, CreateView, UpdateView, DeleteView
+- LoginRequiredMixin
+- UserPassesTestMixin
+- Object-level authorization
+- ModelForm
+- form_valid()
+- get_queryset()
+- get_form_kwargs()
+- get_absolute_url()
+- reverse() vs reverse_lazy()
+- select_related
+- prefetch_related
+- Paginación con paginate_by
+- get_<field>_display()
+- messages framework
+- Post/Redirect/Get
+- Logging de acciones críticas
+
+APPS Y ENTIDADES CUBIERTAS:
+
+core:
+    - ContactMessage
+        · ContactMessageCreateView (público)
+        · ContactMessageListView (staff)
+        · ContactMessageDetailView (staff)
+        · ContactMessageUpdateView (staff)
+        · ContactMessageDeleteView (staff)
+        · StaffRequiredMixin
+
+accounts:
+    - User
+        · UserPublicProfileView
+        · UserListView (staff)
+        · UserSearchForm (filtrado por username / email)
+
+courses:
+    - Course
+        · CourseListView (solo PUBLISHED)
+        · CourseDetailView
+        · CourseCreateView (solo is_academy con academias)
+        · CourseUpdateView (solo propietario)
+        · CourseDeleteView (solo propietario)
+        · MyCourseListView (academia)
+        · CourseForm con filtrado de academias y profesores por user
+    - Category
+        · CategoryListView
+        · CategoryDetailView
+        · CategoryCreateView (staff)
+        · CategoryUpdateView (staff)
+        · CategoryDeleteView (staff)
+    - Convocatoria
+        · ConvocatoriaCreateView (propietario del curso)
+        · ConvocatoriaUpdateView (propietario del curso)
+        · ConvocatoriaDeleteView (propietario del curso)
+        · ConvocatoriaForm
+    - CourseImage
+        · CourseImageCreateView (propietario del curso)
+        · CourseImageUpdateView
+        · CourseImageDeleteView
+        · CourseImageForm
+
+enrollments:
+    - Enrollment
+        · EnrollmentListView (alumno)
+        · EnrollmentDetailView (alumno o academia)
+        · EnrollmentCreateView (alumno, con lógica de lista de espera)
+        · EnrollmentCancelView (alumno)
+        · AcademyEnrollmentListView (academia)
+        · EnrollmentApproveView (academia)
+        · EnrollmentRejectView (academia)
+        · EnrollmentEnrollView (academia)
+        · EnrollmentForm
+    - EnrollmentAnswer
+        · EnrollmentAnswerCreateView (alumno)
+        · EnrollmentAnswerForm
+    - EnrollmentDocument
+        · EnrollmentDocumentCreateView (alumno)
+        · EnrollmentDocumentVerifyView (academia)
+        · EnrollmentDocumentForm
+
+TEMPLATES CREADOS (todas las apps):
+
+templates/core/
+    - contact_form.html
+    - contact_message_list.html
+    - contact_message_detail.html
+    - contact_message_form.html
+    - contact_message_confirm_delete.html
+
+templates/accounts/
+    - public_profile.html
+    - user_list.html
+
+templates/courses/
+    - course_list.html
+    - course_detail.html
+    - course_form.html
+    - course_confirm_delete.html
+    - my_course_list.html
+    - category_list.html
+    - category_detail.html
+    - category_form.html
+    - category_confirm_delete.html
+    - convocatoria_form.html
+    - convocatoria_confirm_delete.html
+    - course_image_form.html
+    - course_image_confirm_delete.html
+
+templates/enrollments/
+    - my_enrollment_list.html
+    - enrollment_detail.html
+    - enrollment_form.html
+    - enrollment_confirm_cancel.html
+    - academy_enrollment_list.html
+    - enrollment_confirm_approve.html
+    - enrollment_confirm_reject.html
+    - enrollment_confirm_enroll.html
+    - answer_form.html
+    - document_form.html
+    - document_confirm_verify.html
+
+templates compartidos (Sesión 2, actualizados):
+    - base.html  → navegación adaptada por rol
+    - 404.html
+
+DECISIONES DE DISEÑO:
+- CRUD completo por app sin tocar el admin de Django (según el PDF de la sesión).
+- Uso de get_absolute_url() en entidades públicas para simplificar redirects.
+- Filtrado de academias y profesores en CourseForm.__init__ con user.
+- Lógica de lista de espera embebida en EnrollmentCreateView.
+- Lista de espera y respuestas/documentos tratados como subentidades de Enrollment.
+- Permisos por rol: alumno, academia, staff, superusuario.
+- Uso de messages para feedback y logging para trazabilidad.
+
+ARCHIVOS CREADOS:
+core/forms.py
+courses/forms.py
+enrollments/forms.py
+academies/forms.py (referenciado por otras vistas)
+
+core/urls.py (ampliado)
+accounts/urls.py (ampliado)
+courses/urls.py
+enrollments/urls.py
+
+core/views.py (ampliado)
+accounts/views.py (ampliado)
+courses/views.py
+enrollments/views.py
+
+Todos los templates listados arriba.
+
+ARCHIVOS MODIFICADOS:
+config/urls.py  → include() de courses y enrollments
+templates/base.html → navegación por rol
+
+TESTS IMPLEMENTADOS:
+- ContactMessage: creación pública, staff puede ver, no-staff recibe 403
+- User: perfil público visible, listado solo para staff
+- Course: listado público, detalle público, solo publicados en listado,
+          crear requiere login, tercero recibe 403 al editar,
+          propietario puede editar
+- Enrollment: alumno puede inscribirse, requiere login,
+              tercero no puede ver inscripción ajena,
+              academia puede aprobar
+- Category: pendiente en sesión de tests globales (staff-only)
+
+COMANDOS:
+python manage.py check
+python manage.py makemigrations
+python manage.py migrate
+python manage.py test
+python manage.py runserver
+
+PROBLEMAS:
+- ImportError: `Academy` importado desde `accounts.models` en accounts/tests.py.
+- TemplateSyntaxError: bloque `title` duplicado en base.html.
+
+SOLUCIONES:
+- Corrección de imports en accounts/tests.py → `from academies.models import Academy`.
+- Eliminación del bloque `title` duplicado en base.html.  (era un conflicto de merging)
+
+COMMIT:
+feat: implement full CRUD across core, accounts, courses and enrollments
+
+ESTADO:
+[X] Completada
+
+OBSERVACIONES:
+Esta sesión convierte los modelos en funcionalidad real. Se ha aplicado
+el patrón CRUD del PDF de la sesión a todas las entidades de las 4 apps
+asignadas, más los templates compartidos por las 5 apps del proyecto.
+
+PRÓXIMA SESIÓN:
+Imágenes múltiples desde formulario, favoritos, búsqueda por texto,
+filtros por categoría / nivel / modalidad / precio, paginación mejorada
+y consultas ORM avanzadas con Q.
