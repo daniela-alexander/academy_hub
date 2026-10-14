@@ -1,9 +1,10 @@
-from django.test import TestCase
 from django.urls import reverse
+
+from core.test_base import VerboseTestCase
 from .models import ContactMessage
 
 
-class HomeViewTests(TestCase):
+class HomeViewTests(VerboseTestCase):
 
     def test_home_page_returns_200(self):
         response = self.client.get(
@@ -25,7 +26,7 @@ class HomeViewTests(TestCase):
             "core/home.html",
         )
 
-class ContactMessageModelTests(TestCase):
+class ContactMessageModelTests(VerboseTestCase):
 
     def test_create_contact_message(self):
         message = ContactMessage.objects.create(

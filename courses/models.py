@@ -56,6 +56,7 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+
 class CourseLevel(models.TextChoices):
     BEGINNER = "beginner", "Básico"
     INTERMEDIATE = "intermediate", "Intermedio"
@@ -235,47 +236,65 @@ class Course(models.Model):
 
 
 class Convocatoria(models.Model):
+    """
+    Edición concreta de un curso con fechas, plazas y precio.
+    """
+
     course = models.ForeignKey(
         Course,
         on_delete=models.CASCADE,
         related_name="convocatorias",
         verbose_name="Curso",
     )
+
     name = models.CharField(
         max_length=150,
         blank=True,
         verbose_name="Nombre",
         help_text="Ej: Verano 2026, Grupo A, Mañanas",
     )
-    start_date = models.DateField()
+
+    start_date = models.DateField(
+        verbose_name="Fecha de inicio",
+    )
+
+    end_date = models.DateField(
+        verbose_name="Fecha de fin",
+    )
+
     enrollment_deadline = models.DateField(
         null=True,
         blank=True,
         verbose_name="Fecha límite de inscripción",
     )
+
     schedule = models.CharField(
         max_length=200,
         blank=True,
         verbose_name="Horario",
         help_text="Ej: L-X-V 18:00-20:00",
     )
+
     modality = models.CharField(
         max_length=20,
         choices=CourseModality.choices,
         default=CourseModality.PRESENCIAL,
         verbose_name="Modalidad",
     )
+
     location = models.CharField(
         max_length=200,
         blank=True,
         verbose_name="Ubicación",
     )
+
     price = models.DecimalField(
         max_digits=10,
         decimal_places=2,
         validators=[MinValueValidator(0)],
         verbose_name="Precio",
     )
+
     deposit = models.DecimalField(
         max_digits=10,
         decimal_places=2,
@@ -284,12 +303,36 @@ class Convocatoria(models.Model):
         verbose_name="Señal / Reserva",
         help_text="Cantidad a pagar para reservar plaza",
     )
-    total_places = models.PositiveIntegerField(default=0, verbose_name="Plazas totales")
-    reserved_places = models.PositiveIntegerField(default=0, verbose_name="Plazas reservadas")
-    enrolled_places = models.PositiveIntegerField(default=0, verbose_name="Plazas matriculadas")
-    is_active = models.BooleanField(default=True, verbose_name="Activa")
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de creación")
-    updated_at = models.DateTimeField(auto_now=True, verbose_name="Última actualización")
+
+    total_places = models.PositiveIntegerField(
+        default=0,
+        verbose_name="Plazas totales",
+    )
+
+    reserved_places = models.PositiveIntegerField(
+        default=0,
+        verbose_name="Plazas reservadas",
+    )
+
+    enrolled_places = models.PositiveIntegerField(
+        default=0,
+        verbose_name="Plazas matriculadas",
+    )
+
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name="Activa",
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name="Fecha de creación",
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name="Última actualización",
+    )
 
     class Meta:
         verbose_name = "Convocatoria"
@@ -317,15 +360,15 @@ class Convocatoria(models.Model):
     @property
     def is_open(self):
         from django.utils import timezone
-
-        if not self.is_active or self.is_full:
+        if not self.is_active:
             return False
-        if (
-            self.enrollment_deadline
-            and timezone.localdate() > self.enrollment_deadline
-        ):
+        if self.is_full:
             return False
+        if self.enrollment_deadline:
+            if timezone.now().date() > self.enrollment_deadline:
+                return False
         return True
+
 
 class CourseImage(models.Model):
     """
