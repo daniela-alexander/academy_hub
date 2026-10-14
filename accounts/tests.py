@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.urls import reverse
 from core.test_base import VerboseTestCase
 
-from .models import Academy
+from academies.models import Academy
 
 User = get_user_model()
 
