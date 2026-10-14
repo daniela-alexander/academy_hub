@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Añadir respuesta{% endblock %}
+
+{% block content %}
+<h1>Añadir respuesta</h1>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Guardar</button>
+    <a href="{% url 'enrollments:detail' view.kwargs.enrollment_pk %}">Cancelar</a>
+</form>
+{% endblock %}

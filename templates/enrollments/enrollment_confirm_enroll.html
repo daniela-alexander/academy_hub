@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Matricular alumno{% endblock %}
+
+{% block content %}
+<h1>Matricular alumno</h1>
+<p>¿Matricular a «{{ object.student }}» en «{{ object.convocatoria.course.title }}»?</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Sí, matricular</button>
+    <a href="{% url 'enrollments:academy_list' %}">Volver</a>
+</form>
+{% endblock %}

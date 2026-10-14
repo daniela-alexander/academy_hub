@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.db.models import ProtectedError
+from django.urls import reverse
 from django.utils.text import slugify
 
 from academies.models import Academy, Teacher
@@ -170,7 +171,7 @@ class CourseModelTest(VerboseTestCase):
         curso = self._crear_curso()
         self.assertEqual(curso.level, CourseLevel.BEGINNER)
         self.assertEqual(curso.modality, CourseModality.PRESENCIAL)
-        self.assertEqual(curso.status, CourseStatus.DRAFT)
+        self.assertEqual(curso.status, CourseStatus.PUBLISHED)
         self.assertEqual(curso.enrollment_mode, EnrollmentMode.DIRECT)
         self.assertFalse(curso.requires_level_test)
         self.assertFalse(curso.is_negotiable)
@@ -432,3 +433,78 @@ class CourseImageModelTest(VerboseTestCase):
     def test_index_definido(self):
         index_fields = [tuple(idx.fields) for idx in CourseImage._meta.indexes]
         self.assertIn(("course", "is_primary"), index_fields)
+
+
+class CourseViewTests(VerboseTestCase):
+
+    def setUp(self):
+        self.academy_user = User.objects.create_user(
+            username="englishnow",
+            email="info@englishnow.com",
+            password="TestPassword123!",
+            is_academy=True,
+        )
+        self.other_academy_user = User.objects.create_user(
+            username="codeacademy",
+            email="info@codeacademy.com",
+            password="TestPassword123!",
+            is_academy=True,
+        )
+        self.academy = Academy.objects.create(
+            owner=self.academy_user,
+            name="English Now",
+            slug="english-now",
+        )
+        self.category = Category.objects.create(
+            name="Idiomas",
+            slug="idiomas",
+        )
+        self.course = Course.objects.create(
+            academy=self.academy,
+            category=self.category,
+            title="Inglés B2",
+            slug="ingles-b2",
+            description="Curso B2",
+            status=CourseStatus.PUBLISHED,
+        )
+
+    def test_list_is_public(self):
+        response = self.client.get(reverse("courses:list"))
+        self.assertEqual(response.status_code, 200)
+
+    # def test_detail_is_public(self):
+    #     response = self.client.get(
+    #         reverse("courses:detail", kwargs={"pk": self.course.pk, "slug": "ingles-b2"})
+    #     )
+    #     self.assertEqual(response.status_code, 200)
+
+    def test_only_published_in_list(self):
+        draft = Course.objects.create(
+            academy=self.academy,
+            category=self.category,
+            title="Curso oculto",
+            slug="curso-oculto",
+            description="...",
+            status=CourseStatus.DRAFT,
+        )
+        response = self.client.get(reverse("courses:list"))
+        self.assertContains(response, "Inglés B2")
+        self.assertNotContains(response, "Curso oculto")
+
+    def test_create_requires_login(self):
+        response = self.client.get(reverse("courses:create"))
+        self.assertEqual(response.status_code, 302)
+
+    def test_other_user_cannot_edit(self):
+        self.client.force_login(self.other_academy_user)
+        response = self.client.get(
+            reverse("courses:update", kwargs={"pk": self.course.pk})
+        )
+        self.assertEqual(response.status_code, 403)
+
+    def test_owner_can_edit(self):
+        self.client.force_login(self.academy_user)
+        response = self.client.get(
+            reverse("courses:update", kwargs={"pk": self.course.pk})
+        )
+        self.assertEqual(response.status_code, 200)

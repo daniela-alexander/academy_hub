@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Inscripciones de mis cursos{% endblock %}
+
+{% block content %}
+<h1>Inscripciones de mis cursos</h1>
+
+{% if enrollments %}
+<table>
+    <thead>
+        <tr>
+            <th>Alumno</th>
+            <th>Curso</th>
+            <th>Convocatoria</th>
+            <th>Estado</th>
+            <th>Fecha</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for enrollment in enrollments %}
+        <tr>
+            <td>{{ enrollment.student }}</td>
+            <td>{{ enrollment.convocatoria.course.title }}</td>
+            <td>{{ enrollment.convocatoria.name|default:enrollment.convocatoria.start_date }}</td>
+            <td>{{ enrollment.get_status_display }}</td>
+            <td>{{ enrollment.created_at|date:"d/m/Y" }}</td>
+            <td>
+                <a href="{% url 'enrollments:detail' enrollment.pk %}">Ver</a>
+                | <a href="{% url 'enrollments:approve' enrollment.pk %}">Aprobar</a>
+                | <a href="{% url 'enrollments:reject' enrollment.pk %}">Rechazar</a>
+                | <a href="{% url 'enrollments:enroll' enrollment.pk %}">Matricular</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No hay inscripciones en tus cursos.</p>
+{% endif %}
+{% endblock %}
