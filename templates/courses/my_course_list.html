@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Mis cursos{% endblock %}
+
+{% block content %}
+<h1>Mis cursos</h1>
+
+<p><a href="{% url 'courses:create' %}">Crear nuevo curso</a></p>
+
+{% if courses %}
+<ul>
+    {% for course in courses %}
+    <li>
+        <a href="{{ course.get_absolute_url }}">{{ course.title }}</a>
+        — {{ course.get_status_display }}
+        — {{ course.academy.name }}
+        (<a href="{% url 'courses:update' course.pk %}">editar</a>
+        | <a href="{% url 'courses:delete' course.pk %}">eliminar</a>)
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>No has creado ningún curso todavía.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Categorías{% endblock %}
+
+{% block content %}
+<h1>Categorías</h1>
+
+{% if user.is_staff %}
+<p><a href="{% url 'courses:category_create' %}">Crear categoría</a></p>
+{% endif %}
+
+{% if categories %}
+<ul>
+    {% for category in categories %}
+    <li>
+        <a href="{% url 'courses:category_detail' category.slug %}">{{ category.name }}</a>
+        {% if user.is_staff %}
+        (<a href="{% url 'courses:category_update' category.slug %}">editar</a>
+        | <a href="{% url 'courses:category_delete' category.slug %}">eliminar</a>)
+        {% endif %}
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>No hay categorías.</p>
+{% endif %}
+{% endblock %}

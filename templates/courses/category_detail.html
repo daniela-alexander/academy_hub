@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}{{ category.name }}{% endblock %}
+
+{% block content %}
+<h1>{{ category.name }}</h1>
+
+{% if category.icon %}<p>Icono: {{ category.icon }}</p>{% endif %}
+{% if category.description %}<p>{{ category.description }}</p>{% endif %}
+
+<h2>Cursos en esta categoría</h2>
+{% if category.courses.all %}
+<ul>
+    {% for course in category.courses.all %}
+    <li><a href="{{ course.get_absolute_url }}">{{ course.title }}</a></li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>No hay cursos en esta categoría.</p>
+{% endif %}
+{% endblock %}

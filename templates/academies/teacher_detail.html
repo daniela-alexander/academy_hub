@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}{{ teacher.first_name }} {{ teacher.last_name }}{% endblock %}
+
+{% block content %}
+<article class="teacher-detail">
+    <h1>{{ teacher.first_name }} {{ teacher.last_name }}</h1>
+
+    {% if teacher.photo %}
+    <img src="{{ teacher.photo.url }}" alt="{{ teacher.first_name }} {{ teacher.last_name }}">
+    {% endif %}
+
+    <p>
+        <strong>Academia:</strong>
+        <a href="{% url 'academies:detail' teacher.academy.slug %}">{{ teacher.academy.name }}</a><br>
+        <strong>Especialidad:</strong> {{ teacher.specialty }}<br>
+        <strong>Email:</strong> {{ teacher.email }}<br>
+        <strong>Teléfono:</strong> {{ teacher.phone }}
+    </p>
+
+    {% if teacher.bio %}
+    <section>
+        <h2>Biografía</h2>
+        <p>{{ teacher.bio }}</p>
+    </section>
+    {% endif %}
+
+    {% if user.is_authenticated and user == teacher.academy.owner %}
+    <p>
+        <a href="{% url 'academies:teacher_update' teacher.pk %}">Editar</a>
+        | <a href="{% url 'academies:teacher_delete' teacher.pk %}">Eliminar</a>
+    </p>
+    {% endif %}
+</article>
+{% endblock %}

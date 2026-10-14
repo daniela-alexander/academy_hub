@@ -1,0 +1,15 @@
+Como etapa inicial, aquí gestionaremos las inscripciones:
+- solicitudes
+- reservas
+- matrículas
+- lista de espera
+- panel de alumnos
+
+
+Más adelante, añadiremos:
+
+- payments
+- notifications
+- evaluations
+- talent
+- api

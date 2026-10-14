@@ -1,0 +1,90 @@
+PROYECTO: Academy Hub
+SESIÓN: 03
+FASE: Desarrollo del núcleo
+TEMA: Usuarios, autenticación y perfiles
+FECHA: 07/10/2026
+HORA DE ENTRADA: 16:15
+HORA DE SALIDA: 17:30
+DURACIÓN: 1hora 15mins
+
+OBJETIVO:
+Implementar un sistema completo de usuarios para Academy Hub.
+
+TEORÍA:
+- Custom User
+- Authentication
+- Authorization
+- Sessions
+- Forms
+- ModelForm
+- UserCreationForm
+- Validaciones
+- CSRF
+- Decoradores
+- request.user
+- login_required
+- Media
+- Logging
+- Testing
+
+FUNCIONALIDADES IMPLEMENTADAS:
+- Registro de academia y alumno
+- Login
+- Logout
+- Perfil privado
+- Edición de perfil
+- Avatar
+- Ciudad
+- Biografía
+- Teléfono
+- Usuario verificado
+- Mensajes de feedback
+- Decorador personalizado
+
+ARCHIVOS CREADOS:
+accounts/forms.py
+accounts/urls.py
+accounts/decorators.py
+
+templates/accounts/register.html
+templates/accounts/login.html
+templates/accounts/profile.html
+templates/accounts/profile_edit.html
+
+ARCHIVOS MODIFICADOS:
+accounts/models.py
+accounts/views.py
+accounts/admin.py
+accounts/tests.py
+config/settings/base.py
+config/urls.py
+templates/base.html
+requirements.txt
+
+TESTS:
+- registro
+- email único
+- login
+- perfil protegido
+- perfil autenticado
+
+COMANDOS:
+python manage.py makemigrations
+python manage.py migrate
+python manage.py check
+python manage.py test
+python manage.py runserver
+
+PROBLEMAS: ninguno
+SOLUCIONES:
+
+COMMIT:
+feat: implement user authentication and profiles
+
+ESTADO:
+[ ] Pendiente
+[ ] En progreso
+[X] Completada
+
+PRÓXIMA SESIÓN:
+Academias, profesores, cursos, categorías y relaciones entre modelos.

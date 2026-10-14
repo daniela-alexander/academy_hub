@@ -1,55 +1,45 @@
 import os
-from pathlib import Path
 from dotenv import load_dotenv
-
-
-
+from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
-load_dotenv(BASE_DIR / ".env")
+load_dotenv(BASE_DIR  / ".env")
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv(
-"DJANGO_SECRET_KEY",
-"unsafe-development-key",
+    "DJANGO_SECRET_KEY",
+    "unsafe-development-key",  #sirve como fallback para el desarrollo. En producción no debería existir esta opción :D
 )
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("DJANGO_DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = []
 
 
 # Application definition
-
 DJANGO_APPS = [
-    "django.contrib.admin",
-    "django.contrib.auth",
-    "django.contrib.contenttypes",
-    "django.contrib.sessions",
-    "django.contrib.messages",
-    "django.contrib.staticfiles",
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
 ]
 
 THIRD_PARTY_APPS = []
 
 LOCAL_APPS = [
     "core",
-    "accounts",
     "academies",
+    "accounts",
     "courses",
+    "enrollments"
 ]
-
-AUTH_USER_MODEL = "accounts.User"
-
-INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
-
-
+INSTALLED_APPS = (
+    *DJANGO_APPS,
+    *THIRD_PARTY_APPS,
+    *LOCAL_APPS
+)
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -111,39 +101,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-
-    "formatters": {
-        "verbose": {
-            "format": (
-        "{levelname} "
-        "{asctime} "
-        "{name} "
-        "{message}"
-        ),
-    "style": "{",
-    },
-},
-    "handlers": {
-        "console": {
-            "class": "logging.StreamHandler",
-            "formatter": "verbose",
-    },
-},
-    "root": {
-        "handlers": [
-            "console",
-],
-    "level": "INFO",
-    },
-}
-
-LOGIN_URL = "accounts:login"
-LOGIN_REDIRECT_URL = "core:home"
-LOGOUT_REDIRECT_URL = "core:home"
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
@@ -160,12 +117,55 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [ BASE_DIR / "static",]
+
+STATICFILES_DIRS = [
+    BASE_DIR / "static"
+]
+
+
+#User media management
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
+# User model to be used
+
+AUTH_USER_MODEL = "accounts.User"
+
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+
+    "formatters": {
+        "verbose": {
+            "format": "{levelname} {asctime} {name} {message}",
+            "style": "{",
+        },
+    },
+
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+    },
+
+    "root": {
+        "handlers": ["console"],
+        "level": "INFO",
+    },
+}
+
+#Log in | Log out
+
+LOGIN_URL = "accounts:login"
+
+LOGIN_REDIRECT_URL = "core:home"
+
+LOGOUT_REDIRECT_URL = "core:home"

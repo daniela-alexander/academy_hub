@@ -1,0 +1,4 @@
+Aquí gestionaremos academias y profesores
+
+- CRUD de las academias
+- Gestión de los profesores
