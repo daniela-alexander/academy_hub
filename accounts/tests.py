@@ -1,11 +1,12 @@
+from datetime import date
 from django.contrib.auth import get_user_model
-from django.test import TestCase
 from django.urls import reverse
+from core.test_base import VerboseTestCase
 
 User = get_user_model()
 
 
-class UserModelTests(TestCase):
+class UserModelTests(VerboseTestCase):
 
     def test_create_user(self):
         user = User.objects.create_user(
@@ -121,7 +122,7 @@ class UserModelTests(TestCase):
 
         self.assertEqual(user.phone, "600123456")
 
-class RegisterTests(TestCase):
+class RegisterTests(VerboseTestCase):
 
     def test_register_page_returns_200(self):
 
@@ -187,7 +188,7 @@ class RegisterTests(TestCase):
             "Ya existe un usuario con este email.",
         )
     
-class LoginTests(TestCase):
+class LoginTests(VerboseTestCase):
 
     def setUp(self):
 
@@ -206,7 +207,7 @@ class LoginTests(TestCase):
 
         self.assertTrue(logged_in)
 
-class ProfileTests(TestCase):
+class ProfileTests(VerboseTestCase):
 
     def test_profile_requires_login(self):
 

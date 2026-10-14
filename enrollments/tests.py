@@ -1,15 +1,12 @@
-from django.test import TestCase
-
 from datetime import timedelta
 from decimal import Decimal
 
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
 from django.db import IntegrityError
-from django.test import TestCase
 from django.utils import timezone
 
 from academies.models import Academy
+from core.test_base import VerboseTestCase
 from courses.models import (
     Category,
     Convocatoria,
@@ -17,7 +14,7 @@ from courses.models import (
     CourseModality,
     CourseStatus,
 )
-from enrollments.models import (
+from .models import (
     Enrollment,
     EnrollmentAnswer,
     EnrollmentDocument,
@@ -33,7 +30,7 @@ User = get_user_model()
 # FIXTURES COMUNES
 # ============================================================
 
-class EnrollmentBaseTestCase(TestCase):
+class EnrollmentBaseTestCase(VerboseTestCase):
     """
     Clase base con los datos mínimos compartidos por todos los tests.
     Se encarga de crear usuario, academia, categoría, curso y convocatoria.
@@ -99,7 +96,7 @@ class EnrollmentBaseTestCase(TestCase):
 # TESTS DE CHOICES
 # ============================================================
 
-class EnrollmentStatusChoicesTests(TestCase):
+class EnrollmentStatusChoicesTests(VerboseTestCase):
     """
     Los choices son strings controlados.
     Comprobamos que los valores esperados existen.

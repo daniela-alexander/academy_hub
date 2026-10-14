@@ -1,12 +1,13 @@
 from django.contrib.auth import get_user_model
-from django.test import TestCase
+
+from core.test_base import VerboseTestCase
 
 from .models import Academy, Teacher
 
 User = get_user_model()
 
 
-class AcademyModelTests(TestCase):
+class AcademyModelTests(VerboseTestCase):
 
     def setUp(self):
         self.user = User.objects.create_user(
@@ -77,7 +78,7 @@ class AcademyModelTests(TestCase):
         self.assertIn(academy2, self.user.academies.all())
 
 
-class TeacherModelTests(TestCase):
+class TeacherModelTests(VerboseTestCase):
 
     def setUp(self):
         self.user = User.objects.create_user(

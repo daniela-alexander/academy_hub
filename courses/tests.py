@@ -1,15 +1,12 @@
-from django.test import TestCase
-
-# Create your tests here.
-# courses/tests.py
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.db.models import ProtectedError
-from django.test import TestCase
 from django.utils.text import slugify
 
 from academies.models import Academy, Teacher
+from core.test_base import VerboseTestCase
+
 from .models import (
     Category,
     Course,
@@ -37,7 +34,7 @@ def crear_usuario(username="owner1"):
 # =============================================================================
 # TESTS: Category
 # =============================================================================
-class CategoryModelTest(TestCase):
+class CategoryModelTest(VerboseTestCase):
 
     @classmethod
     def setUpTestData(cls):
@@ -106,7 +103,7 @@ class CategoryModelTest(TestCase):
 # =============================================================================
 # TESTS: TextChoices
 # =============================================================================
-class TextChoicesTest(TestCase):
+class TextChoicesTest(VerboseTestCase):
 
     def test_course_level_valores(self):
         self.assertEqual(CourseLevel.BEGINNER, "beginner")
@@ -136,7 +133,7 @@ class TextChoicesTest(TestCase):
 # =============================================================================
 # TESTS: Course
 # =============================================================================
-class CourseModelTest(TestCase):
+class CourseModelTest(VerboseTestCase):
 
     @classmethod
     def setUpTestData(cls):
@@ -351,7 +348,7 @@ class CourseModelTest(TestCase):
 # =============================================================================
 # TESTS: CourseImage
 # =============================================================================
-class CourseImageModelTest(TestCase):
+class CourseImageModelTest(VerboseTestCase):
 
     @classmethod
     def setUpTestData(cls):
