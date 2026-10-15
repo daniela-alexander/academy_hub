@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}
+Mi Pasaporte de Talento | Academy Hub
+{% endblock %}
+
+{% block content %}
+
+<h1>Pasaporte de Talento</h1>
+
+<p>
+    <strong>Alumno:</strong>
+    {{ passport.student.username }}
+</p>
+
+{% if passport.headline %}
+<p>
+    <strong>Titular:</strong>
+    {{ passport.headline }}
+</p>
+{% endif %}
+
+{% if passport.summary %}
+<p>
+    <strong>Resumen:</strong>
+    {{ passport.summary }}
+</p>
+{% endif %}
+
+<p>
+    <a href="{% url 'talent:passport_edit' %}">
+        Editar pasaporte
+    </a>
+</p>
+
+<h2>Competencias</h2>
+
+{% for entry in passport.entries.all %}
+
+<article>
+
+    <p>
+        <strong>{{ entry.competence.name }}</strong>
+    </p>
+
+    <p>
+        Nivel: {{ entry.level }}/5
+    </p>
+
+    {% if entry.evidence %}
+    <p>
+        Evidencia: {{ entry.evidence }}
+    </p>
+    {% endif %}
+
+    <p>
+        Obtenida el: {{ entry.obtained_at }}
+    </p>
+
+</article>
+
+<hr>
+
+{% empty %}
+
+<p>
+    Todavía no tienes competencias registradas.
+</p>
+
+{% endfor %}
+
+{% endblock %}

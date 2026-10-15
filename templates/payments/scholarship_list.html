@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}
+Mis becas | Academy Hub
+{% endblock %}
+
+{% block content %}
+
+<h1>Mis becas</h1>
+
+<p>
+    <a href="{% url 'payments:scholarship_request' %}">
+        Solicitar beca
+    </a>
+</p>
+
+{% for scholarship in scholarships %}
+
+<article>
+
+    <p>
+        Inscripción:
+        {{ scholarship.enrollment }}
+    </p>
+
+    <p>
+        Estado: {{ scholarship.get_status_display }}
+    </p>
+
+    {% if scholarship.amount %}
+    <p>
+        Importe concedido: {{ scholarship.amount }} €
+    </p>
+    {% endif %}
+
+    {% if scholarship.reason %}
+    <p>
+        Motivo: {{ scholarship.reason }}
+    </p>
+    {% endif %}
+
+</article>
+
+<hr>
+
+{% empty %}
+
+<p>No has solicitado ninguna beca.</p>
+
+{% endfor %}
+
+{% endblock %}

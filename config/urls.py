@@ -26,6 +26,14 @@ urlpatterns = [
     path("academies/", include("academies.urls")),
     path("courses/", include("courses.urls")),
     path("enrollments/", include("enrollments.urls")),
+    path("reviews/", include("reviews.urls")),
+    path("payments/", include("payments.urls")),
+    path("notifications/", include("notifications.urls")),
+    path("evaluations/", include("evaluations.urls")),
+    path("talent/", include("talent.urls")),
+    path("level-tests/", include("level_tests.urls")),
+    path("search/", include("search.urls")),
+    path("dashboard/", include("dashboard.urls")),
 ]
 
 

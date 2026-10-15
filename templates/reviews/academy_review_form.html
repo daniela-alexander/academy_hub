@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}
+{% if object %}
+Editar valoración
+{% else %}
+Valorar academia
+{% endif %}
+| Academy Hub
+{% endblock %}
+
+{% block content %}
+
+<h1>
+    {% if object %}
+    Editar valoración
+    {% else %}
+    Valorar academia
+    {% endif %}
+</h1>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">
+        {% if object %}
+        Guardar cambios
+        {% else %}
+        Publicar valoración
+        {% endif %}
+    </button>
+</form>
+
+{% endblock %}

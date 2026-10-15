@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}
+Realizar prueba de nivel | Academy Hub
+{% endblock %}
+
+{% block content %}
+
+<h1>Realizar prueba de nivel</h1>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Enviar prueba</button>
+</form>
+
+{% endblock %}

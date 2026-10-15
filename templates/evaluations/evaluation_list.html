@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}
+Evaluaciones | Academy Hub
+{% endblock %}
+
+{% block content %}
+
+<h1>Evaluaciones</h1>
+
+{% for evaluation in evaluations %}
+
+<article>
+
+    <p>
+        Alumno:
+        <strong>{{ evaluation.enrollment.student.username }}</strong>
+    </p>
+
+    <p>
+        Curso:
+        {{ evaluation.enrollment.convocatoria.course.title }}
+    </p>
+
+    <p>
+        Tipo: {{ evaluation.get_kind_display }}
+    </p>
+
+    {% if evaluation.score %}
+    <p>
+        Puntuación: {{ evaluation.score }}
+    </p>
+    {% endif %}
+
+    {% if evaluation.feedback %}
+    <p>
+        Comentarios: {{ evaluation.feedback }}
+    </p>
+    {% endif %}
+
+    <p>
+        <a href="{% url 'evaluations:update' evaluation.pk %}">
+            Editar
+        </a>
+    </p>
+
+</article>
+
+<hr>
+
+{% empty %}
+
+<p>No hay evaluaciones registradas.</p>
+
+{% endfor %}
+
+{% endblock %}

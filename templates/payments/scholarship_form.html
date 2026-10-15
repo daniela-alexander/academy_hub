@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}
+Solicitar beca | Academy Hub
+{% endblock %}
+
+{% block content %}
+
+<h1>Solicitar beca</h1>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Enviar solicitud</button>
+</form>
+
+{% endblock %}

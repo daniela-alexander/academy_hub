@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}
+Mis valoraciones | Academy Hub
+{% endblock %}
+
+{% block content %}
+
+<h1>Mis valoraciones</h1>
+
+{% for review in reviews %}
+
+<article>
+
+    <p>
+        <strong>Curso:</strong>
+        <a href="{{ review.course.get_absolute_url }}">
+            {{ review.course.title }}
+        </a>
+    </p>
+
+    <p>
+        <strong>Valoración:</strong>
+        {{ review.rating }}/5
+    </p>
+
+    {% if review.comment %}
+    <p>{{ review.comment }}</p>
+    {% endif %}
+
+    <p>
+        <a href="{% url 'reviews:course_update' review.pk %}">
+            Editar
+        </a>
+        |
+        <a href="{% url 'reviews:course_delete' review.pk %}">
+            Eliminar
+        </a>
+    </p>
+
+</article>
+
+<hr>
+
+{% empty %}
+
+<p>
+    Todavía no has hecho ninguna valoración.
+</p>
+
+{% endfor %}
+
+{% endblock %}

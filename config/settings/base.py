@@ -30,11 +30,20 @@ THIRD_PARTY_APPS = []
 
 LOCAL_APPS = [
     "core",
-    "academies",
     "accounts",
+    "academies",
     "courses",
-    "enrollments"
+    "enrollments",
+    "reviews",
+    "payments",
+    "notifications",
+    "evaluations",
+    "talent",
+    "level_tests",
+    "search",
+    "dashboard",
 ]
+
 INSTALLED_APPS = (
     *DJANGO_APPS,
     *THIRD_PARTY_APPS,

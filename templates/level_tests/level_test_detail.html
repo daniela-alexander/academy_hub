@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ level_test.title }} | Academy Hub
+{% endblock %}
+
+{% block content %}
+
+<h1>{{ level_test.title }}</h1>
+
+<p>
+    <strong>Curso:</strong>
+    {{ level_test.course.title }}
+</p>
+
+{% if level_test.description %}
+<p>{{ level_test.description }}</p>
+{% endif %}
+
+<p>
+    <strong>Puntuación mínima para aprobar:</strong>
+    {{ level_test.passing_score }}
+</p>
+
+<h2>Preguntas</h2>
+
+{% for question in level_test.questions.all %}
+
+<article>
+    <p><strong>{{ forloop.counter }}. {{ question.question }}</strong></p>
+    <p>A. {{ question.option_a }}</p>
+    <p>B. {{ question.option_b }}</p>
+    {% if question.option_c %}<p>C. {{ question.option_c }}</p>{% endif %}
+    {% if question.option_d %}<p>D. {{ question.option_d }}</p>{% endif %}
+</article>
+
+<hr>
+
+{% empty %}
+
+<p>Esta prueba todavía no tiene preguntas.</p>
+
+{% endfor %}
+
+{% if user.is_authenticated and user.is_student %}
+<p>
+    <a href="{% url 'level_tests:attempt' level_test.pk %}">
+        Realizar prueba
+    </a>
+</p>
+{% endif %}
+
+{% endblock %}

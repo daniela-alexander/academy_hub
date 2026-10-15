@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}
+Pruebas de nivel | Academy Hub
+{% endblock %}
+
+{% block content %}
+
+<h1>Pruebas de nivel</h1>
+
+{% if user.is_authenticated and user.is_academy %}
+<p>
+    <a href="{% url 'level_tests:create' %}">
+        Crear prueba
+    </a>
+</p>
+{% endif %}
+
+{% for level_test in level_tests %}
+
+<article>
+
+    <h2>
+        <a href="{% url 'level_tests:detail' level_test.pk %}">
+            {{ level_test.title }}
+        </a>
+    </h2>
+
+    <p>
+        Curso: {{ level_test.course.title }}
+    </p>
+
+    {% if level_test.description %}
+    <p>{{ level_test.description }}</p>
+    {% endif %}
+
+    <p>
+        Puntuación mínima: {{ level_test.passing_score }}
+    </p>
+
+</article>
+
+<hr>
+
+{% empty %}
+
+<p>No hay pruebas de nivel disponibles.</p>
+
+{% endfor %}
+
+{% endblock %}

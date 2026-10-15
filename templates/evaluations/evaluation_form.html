@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}
+{% if object %}
+Editar evaluación
+{% else %}
+Nueva evaluación
+{% endif %}
+| Academy Hub
+{% endblock %}
+
+{% block content %}
+
+<h1>
+    {% if object %}
+    Editar evaluación
+    {% else %}
+    Nueva evaluación
+    {% endif %}
+</h1>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">
+        {% if object %}
+        Guardar cambios
+        {% else %}
+        Registrar evaluación
+        {% endif %}
+    </button>
+</form>
+
+{% endblock %}

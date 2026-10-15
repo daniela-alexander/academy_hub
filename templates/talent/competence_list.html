@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}
+Competencias | Academy Hub
+{% endblock %}
+
+{% block content %}
+
+<h1>Competencias</h1>
+
+<p>
+    <a href="{% url 'talent:competence_create' %}">
+        Nueva competencia
+    </a>
+</p>
+
+{% for competence in competences %}
+
+<article>
+
+    <h2>{{ competence.name }}</h2>
+
+    {% if competence.category %}
+    <p>
+        Categoría: {{ competence.category.name }}
+    </p>
+    {% endif %}
+
+    {% if competence.description %}
+    <p>{{ competence.description }}</p>
+    {% endif %}
+
+    <p>
+        <a href="{% url 'talent:competence_update' competence.pk %}">
+            Editar
+        </a>
+    </p>
+
+</article>
+
+<hr>
+
+{% empty %}
+
+<p>No hay competencias registradas.</p>
+
+{% endfor %}
+
+{% endblock %}
