@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}
+Notificaciones | Academy Hub
+{% endblock %}
+
+{% block content %}
+
+<h1>Notificaciones</h1>
+
+<p>
+    <a href="{% url 'notifications:mark_all_as_read' %}">
+        Marcar todas como leídas
+    </a>
+</p>
+
+{% for notification in notifications %}
+
+<article>
+
+    <h2>{{ notification.title }}</h2>
+
+    <p>{{ notification.message }}</p>
+
+    <p>
+        Tipo: {{ notification.get_type_display }}
+    </p>
+
+    <p>
+        Fecha: {{ notification.created_at }}
+    </p>
+
+    {% if notification.url %}
+    <p>
+        <a href="{{ notification.url }}">
+            Ver detalle
+        </a>
+    </p>
+    {% endif %}
+
+    {% if not notification.is_read %}
+    <p>
+        <a href="{% url 'notifications:mark_as_read' notification.pk %}">
+            Marcar como leída
+        </a>
+    </p>
+    {% endif %}
+
+</article>
+
+<hr>
+
+{% empty %}
+
+<p>No tienes notificaciones.</p>
+
+{% endfor %}
+
+{% endblock %}

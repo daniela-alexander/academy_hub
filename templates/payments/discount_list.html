@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}
+Descuentos | Academy Hub
+{% endblock %}
+
+{% block content %}
+
+<h1>Descuentos</h1>
+
+<p>
+    <a href="{% url 'payments:discount_create' %}">
+        Crear descuento
+    </a>
+</p>
+
+{% for discount in discounts %}
+
+<article>
+
+    <h2>{{ discount.code }}</h2>
+
+    <p>{{ discount.description }}</p>
+
+    <p>
+        Tipo: {{ discount.get_discount_type_display }}
+    </p>
+
+    <p>
+        Valor: {{ discount.value }}
+    </p>
+
+    <p>
+        Activo:
+        {% if discount.is_active %}
+        Sí
+        {% else %}
+        No
+        {% endif %}
+    </p>
+
+    <p>
+        <a href="{% url 'payments:discount_update' discount.pk %}">
+            Editar
+        </a>
+        |
+        <a href="{% url 'payments:discount_delete' discount.pk %}">
+            Eliminar
+        </a>
+    </p>
+
+</article>
+
+<hr>
+
+{% empty %}
+
+<p>No hay descuentos activos.</p>
+
+{% endfor %}
+
+{% endblock %}

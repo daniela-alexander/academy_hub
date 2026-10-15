@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}
+Aprobar beca | Academy Hub
+{% endblock %}
+
+{% block content %}
+
+<h1>Aprobar beca</h1>
+
+<p>
+    Alumno:
+    <strong>{{ object.student.username }}</strong>
+</p>
+
+<p>
+    Inscripción:
+    <strong>{{ object.enrollment }}</strong>
+</p>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Aprobar beca</button>
+</form>
+
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}
+{% if object %}
+Editar descuento
+{% else %}
+Crear descuento
+{% endif %}
+| Academy Hub
+{% endblock %}
+
+{% block content %}
+
+<h1>
+    {% if object %}
+    Editar descuento
+    {% else %}
+    Crear descuento
+    {% endif %}
+</h1>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">
+        {% if object %}
+        Guardar cambios
+        {% else %}
+        Crear descuento
+        {% endif %}
+    </button>
+</form>
+
+{% endblock %}

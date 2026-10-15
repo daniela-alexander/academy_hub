@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}
+Panel de administración | Academy Hub
+{% endblock %}
+
+{% block content %}
+
+<h1>Panel de administración</h1>
+
+<h2>Estadísticas globales</h2>
+
+<p>
+    <strong>Cursos totales:</strong>
+    {{ total_courses }}
+</p>
+
+<p>
+    <strong>Inscripciones totales:</strong>
+    {{ total_enrollments }}
+</p>
+
+<h2>Accesos rápidos</h2>
+
+<p>
+    <a href="{% url 'accounts:user_list' %}">
+        Listado de usuarios
+    </a>
+</p>
+
+<p>
+    <a href="{% url 'courses:category_list' %}">
+        Gestionar categorías
+    </a>
+</p>
+
+<p>
+    <a href="{% url 'talent:competence_list' %}">
+        Gestionar competencias
+    </a>
+</p>
+
+<p>
+    <a href="{% url 'core:contact_message_list' %}">
+        Mensajes de contacto
+    </a>
+</p>
+
+{% endblock %}

@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}
+Mi panel | Academy Hub
+{% endblock %}
+
+{% block content %}
+
+<h1>Mi panel de academia</h1>
+
+<h2>Mis cursos</h2>
+
+{% for course in my_courses %}
+
+<article>
+
+    <p>
+        <a href="{{ course.get_absolute_url }}">
+            {{ course.title }}
+        </a>
+    </p>
+
+    <p>
+        Estado: {{ course.get_status_display }}
+    </p>
+
+</article>
+
+<hr>
+
+{% empty %}
+
+<p>No tienes cursos todavía.</p>
+
+{% endfor %}
+
+<p>
+    <a href="{% url 'courses:create' %}">
+        Publicar nuevo curso
+    </a>
+</p>
+
+<h2>Inscripciones en mis cursos</h2>
+
+{% for enrollment in my_enrollments %}
+
+<article>
+
+    <p>
+        Alumno: {{ enrollment.student.username }}
+    </p>
+
+    <p>
+        Curso: {{ enrollment.convocatoria.course.title }}
+    </p>
+
+    <p>
+        Estado: {{ enrollment.get_status_display }}
+    </p>
+
+    <p>
+        <a href="{% url 'enrollments:detail' enrollment.pk %}">
+            Ver detalle
+        </a>
+    </p>
+
+</article>
+
+<hr>
+
+{% empty %}
+
+<p>No hay inscripciones todavía.</p>
+
+{% endfor %}
+
+<p>
+    <a href="{% url 'payments:discount_list' %}">
+        Gestionar descuentos
+    </a>
+</p>
+
+<p>
+    <a href="{% url 'evaluations:list' %}">
+        Ver evaluaciones
+    </a>
+</p>
+
+{% endblock %}

@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}
+Buscar cursos | Academy Hub
+{% endblock %}
+
+{% block content %}
+
+<h1>Buscar cursos</h1>
+
+<form method="get">
+
+    <p>
+        <input type="text" name="q" value="{{ current_q }}" placeholder="Buscar por título, descripción o academia">
+    </p>
+
+    <p>
+        <select name="category">
+            <option value="">Todas las categorías</option>
+            {% for cat in categories %}
+            <option value="{{ cat.pk }}" {% if cat.selected %}selected{% endif %}>
+                {{ cat.name }}
+            </option>
+            {% endfor %}
+        </select>
+    </p>
+
+    <p>
+        <select name="level">
+            <option value="">Cualquier nivel</option>
+            {% for lvl in levels %}
+            <option value="{{ lvl.value }}" {% if lvl.selected %}selected{% endif %}>
+                {{ lvl.label }}
+            </option>
+            {% endfor %}
+        </select>
+    </p>
+
+    <p>
+        <select name="modality">
+            <option value="">Cualquier modalidad</option>
+            {% for mod in modalities %}
+            <option value="{{ mod.value }}" {% if mod.selected %}selected{% endif %}>
+                {{ mod.label }}
+            </option>
+            {% endfor %}
+        </select>
+    </p>
+
+    <button type="submit">Buscar</button>
+
+</form>
+
+<hr>
+
+{% for course in courses %}
+
+<article>
+
+    <h2>
+        <a href="{{ course.get_absolute_url }}">
+            {{ course.title }}
+        </a>
+    </h2>
+
+    <p>
+        Academia: {{ course.academy.name }}
+    </p>
+
+    <p>
+        Categoría: {{ course.category.name }}
+    </p>
+
+    <p>
+        Nivel: {{ course.get_level_display }}
+    </p>
+
+    <p>
+        Modalidad: {{ course.get_modality_display }}
+    </p>
+
+</article>
+
+<hr>
+
+{% empty %}
+
+<p>No se encontraron cursos.</p>
+
+{% endfor %}
+
+{% if is_paginated %}
+
+<nav>
+
+    {% if page_obj.has_previous %}
+    <a
+        href="?page={{ page_obj.previous_page_number }}&q={{ current_q }}&category={{ current_category }}&level={{ current_level }}&modality={{ current_modality }}">
+        Anterior
+    </a>
+    {% endif %}
+
+    <span>
+        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+    </span>
+
+    {% if page_obj.has_next %}
+    <a
+        href="?page={{ page_obj.next_page_number }}&q={{ current_q }}&category={{ current_category }}&level={{ current_level }}&modality={{ current_modality }}">
+        Siguiente
+    </a>
+    {% endif %}
+
+</nav>
+
+{% endif %}
+
+{% endblock %}

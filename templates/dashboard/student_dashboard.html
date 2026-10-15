@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}
+Mi panel | Academy Hub
+{% endblock %}
+
+{% block content %}
+
+<h1>Mi panel de alumno</h1>
+
+<h2>Mis inscripciones</h2>
+
+{% for enrollment in my_enrollments %}
+
+<article>
+
+    <p>
+        Curso:
+        {{ enrollment.convocatoria.course.title }}
+    </p>
+
+    <p>
+        Estado: {{ enrollment.get_status_display }}
+    </p>
+
+    <p>
+        <a href="{% url 'enrollments:detail' enrollment.pk %}">
+            Ver detalle
+        </a>
+    </p>
+
+</article>
+
+<hr>
+
+{% empty %}
+
+<p>No tienes inscripciones.</p>
+
+{% endfor %}
+
+<h2>Mis pagos</h2>
+
+{% for payment in my_payments %}
+
+<article>
+
+    <p>
+        Importe: {{ payment.amount }} €
+    </p>
+
+    <p>
+        Estado: {{ payment.get_status_display }}
+    </p>
+
+</article>
+
+<hr>
+
+{% empty %}
+
+<p>No tienes pagos registrados.</p>
+
+{% endfor %}
+
+<h2>Mis valoraciones</h2>
+
+{% for review in my_reviews %}
+
+<article>
+
+    <p>
+        Curso: {{ review.course.title }}
+    </p>
+
+    <p>
+        {{ review.rating }}/5
+    </p>
+
+</article>
+
+<hr>
+
+{% empty %}
+
+<p>No has hecho valoraciones todavía.</p>
+
+{% endfor %}
+
+<p>
+    <a href="{% url 'talent:passport' %}">
+        Ver mi Pasaporte de Talento
+    </a>
+</p>
+
+<p>
+    <a href="{% url 'notifications:list' %}">
+        Ver mis notificaciones
+    </a>
+</p>
+
+{% endblock %}

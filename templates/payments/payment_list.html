@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}
+Pagos | Academy Hub
+{% endblock %}
+
+{% block content %}
+
+<h1>Pagos</h1>
+
+<p>
+    <a href="{% url 'payments:payment_create' %}">
+        Registrar pago
+    </a>
+</p>
+
+{% for payment in payments %}
+
+<article>
+
+    <p>
+        Inscripción:
+        {{ payment.enrollment }}
+    </p>
+
+    <p>
+        Importe: {{ payment.amount }} €
+    </p>
+
+    <p>
+        Estado: {{ payment.get_status_display }}
+    </p>
+
+    {% if payment.discount %}
+    <p>
+        Descuento aplicado:
+        {{ payment.discount.code }}
+    </p>
+    {% endif %}
+
+    {% if payment.reference %}
+    <p>
+        Referencia: {{ payment.reference }}
+    </p>
+    {% endif %}
+
+    <p>
+        Fecha: {{ payment.created_at }}
+    </p>
+
+</article>
+
+<hr>
+
+{% empty %}
+
+<p>No hay pagos registrados.</p>
+
+{% endfor %}
+
+{% endblock %}

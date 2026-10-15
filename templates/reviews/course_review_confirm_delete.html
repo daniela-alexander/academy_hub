@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}
+Eliminar valoración | Academy Hub
+{% endblock %}
+
+{% block content %}
+<h1>Eliminar valoración</h1>
+<p>¿Seguro que quieres eliminar esta valoración?</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Sí, eliminar</button>
+</form>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}
+Valorar curso | Academy Hub
+{% endblock %}
+
+{% block content %}
+<h1>Valorar curso</h1>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Publicar valoración</button>
+</form>
+{% endblock %}
