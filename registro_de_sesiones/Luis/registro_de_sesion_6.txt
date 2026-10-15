@@ -1,0 +1,249 @@
+PROYECTO: Academy Hub
+SESIÓN: 06
+FASE: Desarrollo del núcleo de la plataforma
+TEMA: Imágenes múltiples, favoritos, búsqueda, filtros y ORM avanzado
+      (bloque courses — patrón canónico del equipo)
+FECHA:
+HORA DE ENTRADA:
+HORA DE SALIDA:
+DURACIÓN:
+
+RESPONSABLE: Luis Robert Huertas Araya
+BLOQUE: courses (patrón canónico que el resto del equipo copia), notifications, evaluations, core, dashboard
+
+OBJETIVO:
+Implementar el patrón completo de la Sesión 6 sobre la app courses:
+subida múltiple de imágenes, favoritos de cursos, búsqueda, filtros,
+ordenación, paginación con querystring persistente, contador de visitas
+y optimización ORM. Servir como referencia para el resto del equipo.
+
+TEORÍA ESTUDIADA:
+- request.FILES
+- Subida múltiple de archivos
+- MultipleFileField / MultipleFileInput
+- getlist()
+- Objetos Q
+- Expresiones F
+- Query strings
+- filter(), exclude(), order_by()
+- distinct()
+- exists(), count()
+- get_or_create()
+- UniqueConstraint
+- Paginación con persistencia de filtros
+- select_related / prefetch_related
+- Contador de visitas
+- Optimización ORM
+
+SECCIONES DEL DOCUMENTO IMPLEMENTADAS:
+
+Sección 4.2 — Campo múltiple reutilizable (core/forms.py)
+    - MultipleFileInput
+    - MultipleFileField
+
+Sección 4.3 — Validaciones de imágenes
+    - Máximo 8 imágenes
+    - Máximo 5 MB por imagen
+
+Sección 4.4 — Contador de visitas con F()
+    - F("views_count") + 1
+    - refresh_from_db(fields=["views_count"])
+
+Sección 4.5 — Paginación con querystring persistente
+    - query_params = self.request.GET.copy()
+    - query_params.pop("page", None)
+    - context["querystring"] = query_params.urlencode()
+
+Sección 4.6 — Optimización ORM
+    - select_related("academy", "category", "teacher")
+    - prefetch_related("images", "convocatorias")
+    - distinct() cuando hay joins con 1:N
+
+Sección 4.7 — Modelo Favorite por entidad
+    - CourseFavorite con UniqueConstraint(user, course)
+
+Sección 5 completa — courses como entidad central:
+
+    5.1 Modelo CourseFavorite
+        - user FK
+        - course FK
+        - created_at
+        - UniqueConstraint(user, course)
+        - ordering = ["-created_at"]
+
+    5.2 views_count en Course
+        - PositiveIntegerField(default=0)
+
+    5.3 CourseForm con imágenes múltiples
+        - images = MultipleFileField(required=False)
+        - clean_images() con validación de cantidad y tamaño
+        - Filtrado de academias y profesores por user
+
+    5.4 Vistas:
+        - CourseListView
+            · Filtro por status=PUBLISHED
+            · Búsqueda con Q (title, description, objectives,
+              competences, academy__name, category__name)
+            · Filtros: category, academy, level, modality,
+              min_price, max_price
+            · Ordenación: newest, oldest, price_asc, price_desc, popular
+            · distinct() al final
+            · context: categories, levels, modalities,
+              favorite_course_ids, querystring
+
+        - CourseCreateView
+            · LoginRequiredMixin + UserPassesTestMixin
+            · test_func: is_academy y tiene academias
+            · get_form_kwargs con user
+            · form_valid con transaction.atomic
+            · Creación de CourseImage para cada imagen
+            · Primera imagen marcada como is_primary=True
+            · Posiciones por enumerate
+
+        - toggle_course_favorite (FBV con @login_required + @require_POST)
+            · get_object_or_404 con status=PUBLISHED
+            · Validación de next_url con url_has_allowed_host_and_scheme
+            · No permitir guardar curso propio
+            · get_or_create con transaction.atomic
+            · Si existe, delete()
+            · messages.info o messages.success
+
+        - CourseFavoriteListView
+            · LoginRequiredMixin
+            · Filtro por user=request.user
+            · select_related("course", "course__academy",
+              "course__category", "course__teacher")
+            · prefetch_related("course__images")
+            · paginate_by = 12
+
+        - CourseDetailView
+            · select_related y prefetch_related
+            · get_object con incremento de views_count mediante F()
+            · context: is_favorite, favorite_count
+
+    5.5 URLs
+        - "" → list
+        - "create/" → create
+        - "mine/" → mine
+        - "favorites/" → favorites
+        - "<int:pk>/favorite/" → toggle_favorite
+        - "<int:pk>/<slug:slug>/" → detail
+        - "<int:pk>/edit/" → update
+        - "<int:pk>/delete/" → delete
+        - "<int:course_pk>/convocatorias/create/" → convocatoria_create
+        - "<int:course_pk>/images/create/" → course_image_create
+
+    5.6 Templates
+        - templates/courses/course_list.html
+            · Formulario de búsqueda y filtros
+            · Listado con imágenes principales
+            · Botones de favorito
+            · Paginación con querystring
+        - templates/courses/course_favorite_list.html
+            · Listado de cursos favoritos del usuario
+            · Paginación
+        - templates/courses/course_detail.html
+            · Formulario de favorito (POST)
+            · Contador de usuarios que lo han guardado
+        - templates/courses/course_form.html
+            · enctype="multipart/form-data"
+
+    5.7 Tests
+        - CourseSearchTests
+            · test_search_by_title
+            · test_filter_by_category
+            · test_filter_by_price_range
+            · test_only_published_in_list
+
+        - CourseFavoriteTests
+            · test_student_can_add_favorite
+            · test_student_can_remove_favorite
+            · test_favorite_requires_login
+            · test_owner_cannot_favorite_own_course
+
+        - CourseViewsCounterTests
+            · test_course_view_increments_counter
+
+Sección 12 - notifications - Paginación y filtros
+
+Sección 13 - evaluations - Listado con paginación
+
+Sección 16 - core - ContactMessage con filtros
+
+Sección 17 - dashboard - Contadores y métricas
+
+Sección 18 — Optimización ORM transversal
+    - select_related en CourseListView y CourseDetailView
+    - prefetch_related en CourseDetailView y CourseFavoriteListView
+    - distinct() en CourseListView cuando se filtran convocatorias
+
+Sección 19 — Paginación con querystring
+    - Patrón marcado como canónico para el resto del equipo
+
+Sección 20 — Tests transversales (los propios + revisión)
+Sección 21 — Checklist global (revisión)
+Sección 22 — Registro de sesión (este documento)
+Sección 23 — Commit recomendado
+
+ARCHIVOS CREADOS:
+core/forms.py
+courses/migrations/XXXX_coursefavorite.py (nueva migración)
+templates/courses/course_favorite_list.html
+
+ARCHIVOS MODIFICADOS:
+courses/models.py       → CourseFavorite, views_count en Course
+courses/forms.py        → CourseForm con images, clean_images
+courses/views.py        → CourseListView, CourseCreateView,
+                          toggle_course_favorite, CourseFavoriteListView,
+                          CourseDetailView
+courses/urls.py         → nuevas rutas
+courses/tests.py        → tests de búsqueda, favoritos y contador
+templates/courses/course_list.html      → filtros + paginación + favoritos
+templates/courses/course_detail.html    → favorito + contador
+templates/courses/course_form.html      → enctype multipart
+
+TESTS:
+- Búsqueda por título
+- Filtro por categoría
+- Filtro por rango de precio
+- Solo cursos publicados en listado
+- Añadir favorito
+- Quitar favorito
+- Favorito requiere login
+- Propietario no puede guardar su propio curso
+- Contador de visitas incrementa al ver el detalle
+
+COMANDOS:
+python manage.py makemigrations courses
+python manage.py migrate
+python manage.py check
+python manage.py test
+python manage.py runserver
+
+PROBLEMAS:
+Ninguno. La implementación siguió el patrón del documento sesión_6.md
+sin incidencias. Se creó core/forms.py en primer lugar para desbloquear
+al resto del equipo (academies también lo necesita).
+
+SOLUCIONES:
+No aplica.
+
+COMMIT:
+feat: add course favorites, search, filters and image uploads
+
+ESTADO:
+[X] Completada
+
+OBSERVACIONES:
+Este bloque es el patrón canónico de la Sesión 6. El resto del equipo
+(academies, apps transaccionales, apps auxiliares) copia las convenciones
+aquí establecidas:
+- Campo múltiple reutilizable en core/forms.py
+- Paginación con querystring persistente
+- Favoritos con UniqueConstraint y toggle POST
+- F() para contadores
+- select_related / prefetch_related / distinct
+
+PRÓXIMA SESIÓN:
+Sesión 7 — PostgreSQL, ORM avanzado, constraints, índices, transacciones
+y optimización de consultas.
