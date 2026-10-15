@@ -27,4 +27,13 @@ urlpatterns = [
         "teachers/<int:pk>/delete/",
         views.TeacherDeleteView.as_view(),
         name="teacher_delete",
-), ]
+), path(
+        "favorites/",
+        views.AcademyFavoriteListView.as_view(),
+        name="favorites",
+), path(
+        "<slug:slug>/favorite/",
+        views.toggle_academy_favorite,
+        name="toggle_favorite",
+),
+]

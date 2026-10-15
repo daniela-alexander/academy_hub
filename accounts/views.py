@@ -11,7 +11,7 @@ from django.contrib.auth.mixins import (
 from django.db import models
 from django.shortcuts import redirect, render
 from django.views.generic import DetailView, ListView
-
+from django.db.models import Q
 from .forms import ProfileForm, RegisterForm
 
 User = get_user_model()
@@ -117,10 +117,29 @@ class UserListView(StaffRequiredMixin, ListView):
 
     def get_queryset(self):
         queryset = User.objects.all().order_by("-created_at")
-        q = self.request.GET.get("q")
-        if q:
+
+        query = self.request.GET.get("q", "").strip()
+        if query:
             queryset = queryset.filter(
-                models.Q(username__icontains=q)
-                | models.Q(email__icontains=q)
-            )
+                Q(username__icontains=query)
+                | Q(email__icontains=query)
+                | Q(first_name__icontains=query)
+                | Q(last_name__icontains=query)
+        )
+            
+        role = self.request.GET.get("role")
+        if role == "academy":
+            queryset = queryset.filter(is_academy=True)
+        elif role == "student":
+            queryset = queryset.filter(is_student=True)
+        elif role == "staff":
+            queryset = queryset.filter(is_staff=True)
+
         return queryset
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        query_params = self.request.GET.copy()
+        query_params.pop("page", None)
+        context["querystring"] = query_params.urlencode()
+        return context

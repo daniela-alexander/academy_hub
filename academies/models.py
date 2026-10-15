@@ -80,6 +80,10 @@ class Academy(models.Model):
         verbose_name="Activa",
     )
 
+    views_count = models.PositiveIntegerField(
+        default=0,
+    )
+
     created_at = models.DateTimeField(
         auto_now_add=True,
         verbose_name="Fecha de creación",
@@ -188,3 +192,25 @@ class Teacher(models.Model):
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}".strip()
+    
+class AcademyFavorite(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="academy_favorites",
+    )
+    academy = models.ForeignKey(
+        Academy,
+        on_delete=models.CASCADE,
+        related_name="favorites",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        ordering = ["-created_at"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "academy"],
+                name="unique_user_academy_favorite",
+), ]
+    def __str__(self):
+        return f"{self.user} - {self.academy}"

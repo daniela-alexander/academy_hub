@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}
+Reseñas de cursos | Academy Hub
+{% endblock %}
+{% block content %}
+<h1>Reseñas de cursos</h1>
+<form method="get">
+    <p>
+        <select name="rating">
+            <option value="">Todas las puntuaciones</option>
+            <option value="5" {% if request.GET.rating=="5" %}selected{% endif %}>5 estrell
+            <option value="4" {% if request.GET.rating=="4" %}selected{% endif %}>4 estrell
+            <option value="3" {% if request.GET.rating=="3" %}selected{% endif %}>3 estrell
+            <option value="2" {% if request.GET.rating=="2" %}selected{% endif %}>2 estrell
+            <option value="1" {% if request.GET.rating=="1" %}selected{% endif %}>1 estrell
+        </select>
+    </p>
+    <p>
+        <select name="ordering">
+            <option value="newest" {% if request.GET.ordering=="newest" or not request.GET. Más recientes </option>
+            <option value="oldest" {% if request.GET.ordering=="oldest" %}selected{% endif Más antiguas </option>
+            <option value="best" {% if request.GET.ordering=="best" %}selected{% endif %}>
+                Mejor puntuación
+            </option>
+        </select>
+    </p>
+    <button type="submit">Filtrar</button>
+    <a href="{% url 'reviews:course_review_list' %}">Limpiar</a>
+</form>
+{% for review in reviews %}
+<article>
+    <p>Curso: {{ review.course.title }}</p>
+    <p>Alumno: {{ review.student.username }}</p>
+    <p>Puntuación: {{ review.rating }}/5</p>
+    <p>{{ review.comment }}</p>
+</article>
+<hr>
+{% empty %}
+<p>No hay reseñas que coincidan con los filtros.</p>
+{% endfor %}
+{% if is_paginated %}
+<nav>
+    {% if page_obj.has_previous %}
+    <a href="?{{ querystring }}&page={{ page_obj.previous_page_number }}">Anterior</a {% endif %} <span>Página {{
+    page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+    <a href="?{{ querystring }}&page={{ page_obj.next_page_number }}">Siguiente</a>
+    {% endif %}
+</nav>
+{% endif %}
+{% endblock %}
