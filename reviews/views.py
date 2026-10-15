@@ -133,14 +133,31 @@ class AcademyReviewDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteVie
 
 
 class MyReviewListView(LoginRequiredMixin, ListView):
+    model = CourseReview
     template_name = "reviews/my_reviews.html"
     context_object_name = "reviews"
+    paginate_by = 10
 
     def get_queryset(self):
-        return CourseReview.objects.filter(
-            student=self.request.user
-        ).select_related("course")
+        queryset = (
+            CourseReview.objects
+            .filter(student=self.request.user)
+            .select_related("course")
+            .order_by("-created_at")
+        )
 
+        rating = self.request.GET.get("rating")
+        if rating:
+            queryset = queryset.filter(rating=rating)
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        query_params = self.request.GET.copy()
+        query_params.pop("page", None)
+        context["querystring"] = query_params.urlencode()
+        return context
 
 class CourseReviewListView(ListView):
     model = CourseReview

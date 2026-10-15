@@ -82,6 +82,7 @@ class Academy(models.Model):
 
     views_count = models.PositiveIntegerField(
         default=0,
+        verbose_name="Visitas"
     )
 
     created_at = models.DateTimeField(

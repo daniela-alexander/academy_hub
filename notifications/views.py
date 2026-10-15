@@ -21,10 +21,15 @@ class NotificationListView(LoginRequiredMixin, ListView):
         elif is_read == "0":
             queryset = queryset.filter(is_read=False)
 
-        return queryset
+        notification_type = self.request.GET.get("type")
+        if notification_type:
+            queryset = queryset.filter(type=notification_type)
+
+        return queryset.order_by("-created_at")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["types"] = Notification.Type.choices
         query_params = self.request.GET.copy()
         query_params.pop("page", None)
         context["querystring"] = query_params.urlencode()

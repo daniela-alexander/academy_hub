@@ -38,3 +38,19 @@ class NotificationTests(VerboseTestCase):
         )
         self.notification.refresh_from_db()
         self.assertTrue(self.notification.is_read)
+
+
+def test_notifications_filter_by_type(self):
+    self.client.force_login(self.user)
+    Notification.objects.create(
+        user=self.user, title="A", message="...", type="warning",
+    )
+    Notification.objects.create(
+        user=self.user, title="B", message="...", type="info",
+    )
+    response = self.client.get(
+        reverse("notifications:list"),
+        {"type": "warning"},
+    )
+    self.assertContains(response, "A")
+    self.assertNotContains(response, "B")

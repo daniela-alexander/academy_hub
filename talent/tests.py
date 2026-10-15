@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from core.test_base import VerboseTestCase
 from django.urls import reverse
+from .models import Competence, PassportEntry, TalentPassport
 
 User = get_user_model()
 
@@ -27,3 +28,14 @@ class PassportTests(VerboseTestCase):
         self.client.force_login(student)
         response = self.client.get(reverse("talent:competence_list"))
         self.assertEqual(response.status_code, 403)
+
+
+def test_passport_entries_paginated(self):
+    self.client.force_login(self.student)
+    passport, _ = TalentPassport.objects.get_or_create(student=self.student)
+    for i in range(25):
+        competence = Competence.objects.create(name=f"C{i}")
+        PassportEntry.objects.create(
+            passport=passport, competence=competence,
+        )
+    response = self.client.get(reverse("talent:passport"))

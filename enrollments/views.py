@@ -1,5 +1,7 @@
 import logging
 
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.views.generic import ListView
 from django.contrib import messages
 from django.contrib.auth.mixins import (
     LoginRequiredMixin,
@@ -14,6 +16,10 @@ from django.views.generic import (
     ListView,
     UpdateView,
 )
+
+from courses.models import Course
+
+from .models import Enrollment, EnrollmentStatus
 
 from courses.models import Convocatoria
 
@@ -164,19 +170,46 @@ class AcademyEnrollmentListView(LoginRequiredMixin, UserPassesTestMixin, ListVie
     model = Enrollment
     template_name = "enrollments/academy_enrollment_list.html"
     context_object_name = "enrollments"
+    paginate_by = 20
 
     def test_func(self):
         return self.request.user.is_academy
 
     def get_queryset(self):
-        return (
+        queryset = (
             Enrollment.objects
-            .filter(
-                convocatoria__course__academy__owner=self.request.user
+            .filter(convocatoria__course__academy__owner=self.request.user)
+            .select_related(
+                "student",
+                "convocatoria",
+                "convocatoria__course",
             )
-            .select_related("student", "convocatoria", "convocatoria__course")
             .order_by("-created_at")
         )
+
+        status = self.request.GET.get("status")
+        if status:
+            queryset = queryset.filter(status=status)
+
+        course_id = self.request.GET.get("course")
+        if course_id:
+            queryset = queryset.filter(convocatoria__course_id=course_id)
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context["statuses"] = EnrollmentStatus.choices
+        context["courses"] = Course.objects.filter(
+            academy__owner=self.request.user
+        ).order_by("title")
+
+        query_params = self.request.GET.copy()
+        query_params.pop("page", None)
+        context["querystring"] = query_params.urlencode()
+
+        return context
 
 
 class EnrollmentApproveView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):

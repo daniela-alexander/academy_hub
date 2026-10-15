@@ -8,46 +8,79 @@ Mis valoraciones | Academy Hub
 
 <h1>Mis valoraciones</h1>
 
+<form method="get" action="{% url 'reviews:mine' %}">
+    <p>
+        <select name="rating">
+            <option value="">Todas las puntuaciones</option>
+            <option value="5" {% if request.GET.rating == "5" %}selected{% endif %}>5 estrellas</option>
+            <option value="4" {% if request.GET.rating == "4" %}selected{% endif %}>4 estrellas</option>
+            <option value="3" {% if request.GET.rating == "3" %}selected{% endif %}>3 estrellas</option>
+            <option value="2" {% if request.GET.rating == "2" %}selected{% endif %}>2 estrellas</option>
+            <option value="1" {% if request.GET.rating == "1" %}selected{% endif %}>1 estrella</option>
+        </select>
+    </p>
+    <button type="submit">Filtrar</button>
+    <a href="{% url 'reviews:mine' %}">Limpiar</a>
+</form>
+
 {% for review in reviews %}
 
-<article>
+    <article>
 
-    <p>
-        <strong>Curso:</strong>
-        <a href="{{ review.course.get_absolute_url }}">
-            {{ review.course.title }}
-        </a>
-    </p>
+        <p>
+            <strong>Curso:</strong>
+            <a href="{{ review.course.get_absolute_url }}">
+                {{ review.course.title }}
+            </a>
+        </p>
 
-    <p>
-        <strong>Valoración:</strong>
-        {{ review.rating }}/5
-    </p>
+        <p>
+            <strong>Valoración:</strong>
+            {{ review.rating }}/5
+        </p>
 
-    {% if review.comment %}
-    <p>{{ review.comment }}</p>
-    {% endif %}
+        {% if review.comment %}
+            <p>{{ review.comment }}</p>
+        {% endif %}
 
-    <p>
-        <a href="{% url 'reviews:course_update' review.pk %}">
-            Editar
-        </a>
-        |
-        <a href="{% url 'reviews:course_delete' review.pk %}">
-            Eliminar
-        </a>
-    </p>
+        <p>
+            <a href="{% url 'reviews:course_update' review.pk %}">Editar</a>
+            |
+            <a href="{% url 'reviews:course_delete' review.pk %}">Eliminar</a>
+        </p>
 
-</article>
+    </article>
 
-<hr>
+    <hr>
 
 {% empty %}
 
-<p>
-    Todavía no has hecho ninguna valoración.
-</p>
+    <p>No tienes valoraciones que coincidan con los filtros.</p>
 
 {% endfor %}
+
+{% if is_paginated %}
+
+    <nav aria-label="Paginación de valoraciones">
+
+        {% if page_obj.has_previous %}
+            <a href="?{{ querystring }}&page={{ page_obj.previous_page_number }}">
+                Anterior
+            </a>
+        {% endif %}
+
+        <span>
+            Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?{{ querystring }}&page={{ page_obj.next_page_number }}">
+                Siguiente
+            </a>
+        {% endif %}
+
+    </nav>
+
+{% endif %}
 
 {% endblock %}
