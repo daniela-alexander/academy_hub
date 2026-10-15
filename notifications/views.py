@@ -13,7 +13,22 @@ class NotificationListView(LoginRequiredMixin, ListView):
     paginate_by = 20
 
     def get_queryset(self):
-        return Notification.objects.filter(user=self.request.user)
+        queryset = Notification.objects.filter(user=self.request.user)
+
+        is_read = self.request.GET.get("is_read")
+        if is_read == "1":
+            queryset = queryset.filter(is_read=True)
+        elif is_read == "0":
+            queryset = queryset.filter(is_read=False)
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        query_params = self.request.GET.copy()
+        query_params.pop("page", None)
+        context["querystring"] = query_params.urlencode()
+        return context
 
 
 def mark_as_read(request, pk):
