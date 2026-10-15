@@ -552,6 +552,7 @@ class CourseSearchTests(VerboseTestCase):
         Convocatoria.objects.create(
             course=self.course1,
             start_date="2026-07-01",
+            end_date="2026-09-01",
             price=Decimal("480.00"),
             total_places=15,
         )

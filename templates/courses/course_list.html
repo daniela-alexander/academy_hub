@@ -18,7 +18,7 @@ Cursos | Academy Hub
         <select name="category">
             <option value="">Todas las categorías</option>
             {% for cat in categories %}
-            <option value="{{ cat.slug }}" {% if request.GET.category==cat.slug %}selected{% endif %}>
+            <option value="{{ cat.slug }}" {% if request.GET.category == cat.slug %}selected{% endif %}>
                 {{ cat.name }}
             </option>
             {% endfor %}
@@ -29,7 +29,7 @@ Cursos | Academy Hub
         <select name="level">
             <option value="">Cualquier nivel</option>
             {% for value, label in levels %}
-            <option value="{{ value }}" {% if request.GET.level==value %}selected{% endif %}>
+            <option value="{{ value }}" {% if request.GET.level == value %}selected{% endif %}>
                 {{ label }}
             </option>
             {% endfor %}
@@ -40,7 +40,7 @@ Cursos | Academy Hub
         <select name="modality">
             <option value="">Cualquier modalidad</option>
             {% for value, label in modalities %}
-            <option value="{{ value }}" {% if request.GET.modality==value %}selected{% endif %}>
+            <option value="{{ value }}" {% if request.GET.modality == value %}selected{% endif %}>
                 {{ label }}
             </option>
             {% endfor %}
@@ -57,17 +57,16 @@ Cursos | Academy Hub
 
     <p>
         <select name="ordering">
-            <option value="newest" {% if request.GET.ordering=="newest" or not request.GET.ordering %}selected{% endif
-                %}>
+            <option value="newest" {% if request.GET.ordering == "newest" or not request.GET.ordering %}selected{% endif %}>
                 Más recientes
             </option>
-            <option value="price_asc" {% if request.GET.ordering=="price_asc" %}selected{% endif %}>
+            <option value="price_asc" {% if request.GET.ordering == "price_asc" %}selected{% endif %}>
                 Precio: menor a mayor
             </option>
-            <option value="price_desc" {% if request.GET.ordering=="price_desc" %}selected{% endif %}>
+            <option value="price_desc" {% if request.GET.ordering == "price_desc" %}selected{% endif %}>
                 Precio: mayor a menor
             </option>
-            <option value="popular" {% if request.GET.ordering=="popular" %}selected{% endif %}>
+            <option value="popular" {% if request.GET.ordering == "popular" %}selected{% endif %}>
                 Más vistos
             </option>
         </select>

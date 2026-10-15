@@ -55,6 +55,11 @@ urlpatterns = [
         name="delete",
     ),
     path(
+        "<int:pk>/favorite/",
+        views.toggle_course_favorite,
+        name="toggle_favorite",
+    ),
+    path(
         "<int:pk>/<slug:slug>/",
         views.CourseDetailView.as_view(),
         name="detail",
@@ -103,9 +108,4 @@ urlpatterns = [
     views.CourseFavoriteListView.as_view(),
     name="favorites",
     ),
-    path(
-        "<int:pk>/favorite/",
-        views.toggle_course_favorite,
-        name="toggle_favorite",
-    ),  
 ]
