@@ -1,0 +1,267 @@
+PROYECTO: Academy Hub
+SESIÓN: ESPECIAL (ampliación del proyecto)
+FASE: Desarrollo del núcleo de la plataforma
+TEMA: Implementación completa de las 8 apps que faltaban para cubrir
+      todo el ciclo del alumno y de la academia
+FECHA: 15/10/2026
+HORA DE ENTRADA: 17:00
+HORA DE SALIDA: 17:45
+DURACIÓN: 45 minutos.
+
+RESPONSABLE: Luis Robert Huertas Araya
+
+OBJETIVO:
+Extender Academy Hub con las 8 apps que faltaban para cubrir el diseño
+original completo: valoraciones, pagos, notificaciones, evaluaciones,
+Pasaporte de Talento, prueba de nivel, buscador avanzado y dashboard
+por rol.
+
+TEORÍA ESTUDIADA:
+- Model
+- ForeignKey / OneToOne
+- on_delete (CASCADE, PROTECT, SET_NULL)
+- related_name
+- TextChoices
+- UniqueConstraint
+- DecimalField
+- DateField
+- ImageField / FileField
+- Meta: ordering, indexes
+- Migraciones
+- Vistas CBV: ListView, DetailView, CreateView, UpdateView, DeleteView
+- LoginRequiredMixin
+- UserPassesTestMixin
+- Object-level permissions
+- ModelForm
+- form_valid()
+- get_queryset()
+- get_context_data()
+- get_success_url()
+- reverse_lazy()
+- select_related / prefetch_related
+- Paginación
+- messages framework
+- logging
+- Post/Redirect/Get
+
+APPS IMPLEMENTADAS:
+
+reviews:
+    - CourseReview
+    - AcademyReview
+    - Formularios CourseReviewForm, AcademyReviewForm
+    - Vistas: CourseReviewCreateView, CourseReviewUpdateView,
+      CourseReviewDeleteView, AcademyReviewCreateView,
+      AcademyReviewUpdateView, AcademyReviewDeleteView, MyReviewListView
+    - URLs
+    - Templates
+    - Tests
+
+payments:
+    - Discount
+    - Scholarship
+    - Payment
+    - Formularios DiscountForm, ScholarshipForm, PaymentForm
+    - Vistas: DiscountListView, DiscountCreateView, DiscountUpdateView,
+      DiscountDeleteView, StudentScholarshipListView,
+      ScholarshipRequestView, ScholarshipApproveView,
+      PaymentListView, PaymentCreateView
+    - URLs
+    - Templates
+    - Tests
+
+notifications:
+    - Notification
+    - Vista: NotificationListView
+    - Vistas de acción: mark_as_read, mark_all_as_read
+    - URLs
+    - Templates
+    - Tests
+
+evaluations:
+    - Evaluation
+    - Formulario EvaluationForm
+    - Vistas: EvaluationListView, EvaluationCreateView,
+      EvaluationUpdateView
+    - URLs
+    - Templates
+    - Tests
+
+talent:
+    - Competence
+    - TalentPassport
+    - PassportEntry
+    - Formularios CompetenceForm, PassportEntryForm, TalentPassportForm
+    - Vistas: CompetenceListView, CompetenceCreateView,
+      CompetenceUpdateView, MyPassportView, MyPassportEditView,
+      PassportEntryCreateView
+    - URLs
+    - Templates
+    - Tests
+
+level_tests:
+    - LevelTest
+    - LevelTestQuestion
+    - LevelTestAttempt
+    - Formularios LevelTestForm, LevelTestAttemptForm
+    - Vistas: LevelTestListView, LevelTestDetailView,
+      LevelTestCreateView, LevelTestUpdateView, LevelTestAttemptView
+    - URLs
+    - Templates
+    - Tests
+
+search:
+    - CourseSearchForm
+    - Vista: CourseSearchView
+    - URLs
+    - Templates
+    - Tests
+
+dashboard:
+    - Vista: DashboardView (adaptada por rol)
+    - Templates: student_dashboard, academy_dashboard, staff_dashboard
+    - URLs
+    - Tests
+
+DECISIONES DE DISEÑO:
+- Separación estricta por app, siguiendo el principio de una app una
+  responsabilidad.
+- reviews como app independiente (no dentro de courses ni academies).
+- TalentPassport creado bajo demanda con get_or_create.
+- LevelTest con preguntas y attempts como subentidades.
+- Dashboard detecta el rol en get_template_names y reutiliza un único
+  TemplateView.
+- Search público, accesible sin login.
+- Uso consistente de LoginRequiredMixin + UserPassesTestMixin.
+- Uso consistente de messages + logging.
+
+ARCHIVOS CREADOS:
+reviews/models.py
+reviews/forms.py
+reviews/views.py
+reviews/urls.py
+reviews/tests.py
+reviews/migrations/0001_initial.py
+
+payments/models.py
+payments/forms.py
+payments/views.py
+payments/urls.py
+payments/tests.py
+payments/migrations/0001_initial.py
+
+notifications/models.py
+notifications/views.py
+notifications/urls.py
+notifications/tests.py
+notifications/migrations/0001_initial.py
+
+evaluations/models.py
+evaluations/forms.py
+evaluations/views.py
+evaluations/urls.py
+evaluations/tests.py
+evaluations/migrations/0001_initial.py
+
+talent/models.py
+talent/forms.py
+talent/views.py
+talent/urls.py
+talent/tests.py
+talent/migrations/0001_initial.py
+
+level_tests/models.py
+level_tests/forms.py
+level_tests/views.py
+level_tests/urls.py
+level_tests/tests.py
+level_tests/migrations/0001_initial.py
+
+search/forms.py
+search/views.py
+search/urls.py
+search/tests.py
+
+dashboard/views.py
+dashboard/urls.py
+dashboard/tests.py
+
+Templates:
+templates/reviews/course_review_form.html
+templates/reviews/course_review_confirm_delete.html
+templates/reviews/academy_review_form.html
+templates/reviews/academy_review_confirm_delete.html
+templates/reviews/my_reviews.html
+
+templates/payments/discount_list.html
+templates/payments/discount_form.html
+templates/payments/scholarship_list.html
+templates/payments/scholarship_form.html
+templates/payments/scholarship_approve.html
+templates/payments/payment_list.html
+templates/payments/payment_form.html
+
+templates/notifications/notification_list.html
+
+templates/evaluations/evaluation_list.html
+templates/evaluations/evaluation_form.html
+
+templates/talent/passport_detail.html
+templates/talent/passport_form.html
+templates/talent/competence_list.html
+templates/talent/competence_form.html
+templates/talent/entry_form.html
+
+templates/level_tests/level_test_list.html
+templates/level_tests/level_test_detail.html
+templates/level_tests/level_test_form.html
+templates/level_tests/attempt_form.html
+
+templates/search/course_search.html
+
+templates/dashboard/student_dashboard.html
+templates/dashboard/academy_dashboard.html
+templates/dashboard/staff_dashboard.html
+
+ARCHIVOS MODIFICADOS:
+config/settings/base.py  → LOCAL_APPS con las 8 apps nuevas
+config/urls.py           → include() de las 8 apps nuevas
+
+TESTS IMPLEMENTADOS:
+- reviews: creación de reseña, no duplicar reseña, requiere login
+- payments: academia puede crear descuento, alumno no puede
+- notifications: usuario ve solo sus notificaciones, marcar como leída
+- evaluations: academia ve evaluaciones, alumno no
+- talent: alumno ve su pasaporte, competencias requieren staff
+- level_tests: listado público, crear requiere academia
+- search: página pública
+- dashboard: requiere login, alumno ve su dashboard
+
+COMANDOS:
+python manage.py makemigrations reviews payments notifications evaluations talent level_tests
+python manage.py migrate
+python manage.py check
+python manage.py test
+python manage.py runserver
+
+PROBLEMAS:
+Ninguno relevante. La implementación siguió el patrón establecido en la
+Sesión 5 sin incidencias.
+
+SOLUCIONES:
+No aplica.
+
+COMMIT:
+feat: add reviews, payments, notifications, evaluations, talent,
+level_tests, search and dashboard apps
+
+ESTADO:
+[X] Completada
+
+OBSERVACIONES:
+Esta sesión amplía Academy Hub hasta cubrir el diseño original completo.
+Se implementaron las 8 apps de principio a fin: modelos, formularios,
+vistas, URLs, templates y tests. Todos los tests pasan correctamente.
+
+PRÓXIMA SESIÓN:
+Sesión 6 — Imágenes múltiples, favoritos, búsqueda, filtros y ORM avanzado.
