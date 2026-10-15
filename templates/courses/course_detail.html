@@ -84,4 +84,19 @@
     </p>
     {% endif %}
 </article>
+
+{% if user.is_authenticated and course.academy.owner_id != user.pk %}
+<form method="post" action="{% url 'courses:toggle_favorite' course.pk %}">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+    {% if is_favorite %}
+    <button type="submit">Quitar de favoritos</button>
+    {% else %}
+    <button type="submit">Añadir a favoritos</button>
+    {% endif %}
+</form>
+{% endif %}
+
+<p>{{ favorite_count }} usuarios han guardado este curso.</p>
+
 {% endblock %}

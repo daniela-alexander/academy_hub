@@ -97,4 +97,15 @@ urlpatterns = [
         views.CourseImageDeleteView.as_view(),
         name="course_image_delete",
     ),
+
+    path(
+    "favorites/",
+    views.CourseFavoriteListView.as_view(),
+    name="favorites",
+    ),
+    path(
+        "<int:pk>/favorite/",
+        views.toggle_course_favorite,
+        name="toggle_favorite",
+    ),  
 ]

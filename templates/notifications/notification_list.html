@@ -8,6 +8,15 @@ Notificaciones | Academy Hub
 
 <h1>Notificaciones</h1>
 
+<form method="get">
+    <select name="is_read">
+        <option value="">Todas</option>
+        <option value="0" {% if request.GET.is_read=="0" %}selected{% endif %}>No leídas</option>
+        <option value="1" {% if request.GET.is_read=="1" %}selected{% endif %}>Leídas</option>
+    </select>
+    <button type="submit">Filtrar</button>
+</form>
+
 <p>
     <a href="{% url 'notifications:mark_all_as_read' %}">
         Marcar todas como leídas
@@ -55,5 +64,17 @@ Notificaciones | Academy Hub
 <p>No tienes notificaciones.</p>
 
 {% endfor %}
+
+{% if is_paginated %}
+<nav>
+    {% if page_obj.has_previous %}
+    <a href="?{{ querystring }}&page={{ page_obj.previous_page_number }}">Anterior</a>
+    {% endif %}
+    <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+    <a href="?{{ querystring }}&page={{ page_obj.next_page_number }}">Siguiente</a>
+    {% endif %}
+</nav>
+{% endif %}
 
 {% endblock %}

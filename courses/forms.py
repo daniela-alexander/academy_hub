@@ -3,7 +3,15 @@ from django import forms
 from .models import Category, Convocatoria, Course, CourseImage
 
 
+from django import forms
+
+from core.forms import MultipleFileField
+
+from .models import Category, Convocatoria, Course
+
+
 class CourseForm(forms.ModelForm):
+    images = MultipleFileField(required=False)
 
     class Meta:
         model = Course
@@ -30,8 +38,27 @@ class CourseForm(forms.ModelForm):
         if user is not None:
             self.fields["academy"].queryset = user.academies.filter(is_active=True)
             self.fields["teacher"].queryset = self.fields["teacher"].queryset.filter(
-                academy__owner=user, is_active=True
+                academy__owner=user,
+                is_active=True,
             )
+
+    def clean_images(self):
+        images = self.cleaned_data.get("images") or []
+
+        if len(images) > 8:
+            raise forms.ValidationError(
+                "Puedes subir como máximo 8 imágenes."
+            )
+
+        max_size = 5 * 1024 * 1024  # 5 MB
+        for image in images:
+            if image.size > max_size:
+                raise forms.ValidationError(
+                    "Cada imagen no puede superar los 5 MB."
+                )
+
+        return images
+
 
 
 class CategoryForm(forms.ModelForm):
