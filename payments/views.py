@@ -2,6 +2,7 @@ import logging
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.db.models import Q
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.views.generic import CreateView, ListView, UpdateView
@@ -21,6 +22,31 @@ class DiscountListView(AcademyRequiredMixin, ListView):
     model = Discount
     template_name = "payments/discount_list.html"
     context_object_name = "discounts"
+    paginate_by = 20
+
+    def get_queryset(self):
+        queryset = Discount.objects.all().order_by("-created_at")
+
+        query = self.request.GET.get("q", "").strip()
+        if query:
+            queryset = queryset.filter(
+                Q(code__icontains=query) | Q(description__icontains=query)
+            )
+
+        is_active = self.request.GET.get("is_active")
+        if is_active == "1":
+            queryset = queryset.filter(is_active=True)
+        elif is_active == "0":
+            queryset = queryset.filter(is_active=False)
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        query_params = self.request.GET.copy()
+        query_params.pop("page", None)
+        context["querystring"] = query_params.urlencode()
+        return context
 
 
 class DiscountCreateView(AcademyRequiredMixin, CreateView):
@@ -91,18 +117,72 @@ class ScholarshipApproveView(AcademyRequiredMixin, UpdateView):
         return reverse_lazy("payments:scholarship_list")
 
 
+class StudentScholarshipListView(LoginRequiredMixin, ListView):
+    model = Scholarship
+    template_name = "payments/scholarship_list.html"
+    context_object_name = "scholarships"
+    paginate_by = 10
+
+    def get_queryset(self):
+        queryset = (
+            Scholarship.objects
+            .filter(student=self.request.user)
+            .select_related("enrollment")
+            .order_by("-created_at")
+        )
+
+        status = self.request.GET.get("status")
+        if status:
+            queryset = queryset.filter(status=status)
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["statuses"] = Scholarship.Status.choices
+
+        query_params = self.request.GET.copy()
+        query_params.pop("page", None)
+        context["querystring"] = query_params.urlencode()
+
+        return context
+
+
 class PaymentListView(LoginRequiredMixin, ListView):
     model = Payment
     template_name = "payments/payment_list.html"
     context_object_name = "payments"
+    paginate_by = 20
 
     def get_queryset(self):
         user = self.request.user
         if user.is_academy:
-            return Payment.objects.filter(
+            queryset = Payment.objects.filter(
                 enrollment__convocatoria__course__academy__owner=user
             )
-        return Payment.objects.filter(enrollment__student=user)
+        else:
+            queryset = Payment.objects.filter(enrollment__student=user)
+
+        queryset = queryset.select_related(
+            "enrollment",
+            "enrollment__student",
+            "enrollment__convocatoria__course",
+            "discount",
+        )
+
+        status = self.request.GET.get("status")
+        if status:
+            queryset = queryset.filter(status=status)
+
+        return queryset.order_by("-created_at")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["statuses"] = Payment.Status.choices
+        query_params = self.request.GET.copy()
+        query_params.pop("page", None)
+        context["querystring"] = query_params.urlencode()
+        return context
 
 
 class PaymentCreateView(LoginRequiredMixin, CreateView):

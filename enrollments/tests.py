@@ -3,6 +3,7 @@ from decimal import Decimal
 
 from django.contrib.auth import get_user_model
 from django.db import IntegrityError
+from django.test import TestCase
 from django.utils import timezone
 from django.urls import reverse
 
@@ -891,3 +892,74 @@ class EnrollmentViewTests(EnrollmentBaseTestCase):
         )
         enrollment.refresh_from_db()
         self.assertEqual(enrollment.status, EnrollmentStatus.APPROVED)
+
+
+class AcademyEnrollmentListTests(TestCase):
+
+    def setUp(self):
+        self.academy_user = User.objects.create_user(
+            username="englishnow",
+            email="info@englishnow.com",
+            password="TestPassword123!",
+            is_academy=True,
+        )
+        self.student = User.objects.create_user(
+            username="laura",
+            email="laura@example.com",
+            password="TestPassword123!",
+            is_student=True,
+        )
+        self.academy = Academy.objects.create(
+            owner=self.academy_user,
+            name="English Now",
+            slug="english-now",
+        )
+        self.category = Category.objects.create(name="Idiomas", slug="idiomas")
+        self.course = Course.objects.create(
+            academy=self.academy,
+            category=self.category,
+            title="Inglés B2",
+            slug="ingles-b2",
+            description="...",
+        )
+        self.convocatoria = Convocatoria.objects.create(
+            course=self.course,
+            start_date="2026-07-01",
+            end_date="2026-09-01",
+            price=Decimal("480.00"),
+            total_places=15,
+        )
+
+    def test_academy_sees_own_enrollments(self):
+        Enrollment.objects.create(
+            student=self.student,
+            convocatoria=self.convocatoria,
+        )
+        self.client.force_login(self.academy_user)
+        response = self.client.get(reverse("enrollments:academy_list"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "laura")
+
+    def test_filter_by_status(self):
+        Enrollment.objects.create(
+            student=self.student,
+            convocatoria=self.convocatoria,
+            status=EnrollmentStatus.PENDING,
+        )
+        self.client.force_login(self.academy_user)
+        response = self.client.get(
+            reverse("enrollments:academy_list"),
+            {"status": "pending"},
+        )
+        self.assertEqual(response.status_code, 200)
+
+
+def test_academy_enrollments_paginadas(self):
+    self.client.force_login(self.academy_user)
+    for i in range(25):
+        Enrollment.objects.create(
+            student=self.student,
+            convocatoria=self.convocatoria,
+        )
+    response = self.client.get(reverse("enrollments:academy_list"))
+    self.assertEqual(len(response.context["enrollments"]), 20)

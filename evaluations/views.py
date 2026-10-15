@@ -20,11 +20,16 @@ class EvaluationListView(AcademyRequiredMixin, ListView):
     model = Evaluation
     template_name = "evaluations/evaluation_list.html"
     context_object_name = "evaluations"
+    paginate_by = 20
 
     def get_queryset(self):
-        return Evaluation.objects.filter(
-            enrollment__convocatoria__course__academy__owner=self.request.user
-        ).select_related("enrollment", "enrollment__student")
+        return (
+            Evaluation.objects
+            .filter(enrollment__convocatoria__course__academy__owner=self.request.user)
+            .select_related("enrollment", "enrollment__student")
+            .order_by("-created_at")
+        )
+
 
 
 class EvaluationCreateView(AcademyRequiredMixin, CreateView):

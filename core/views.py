@@ -54,7 +54,23 @@ class ContactMessageListView(StaffRequiredMixin, ListView):
     paginate_by = 20
 
     def get_queryset(self):
-        return ContactMessage.objects.all().order_by("-created_at")
+        queryset = ContactMessage.objects.all().order_by("-created_at")
+
+        is_read = self.request.GET.get("is_read")
+        if is_read == "1":
+            queryset = queryset.filter(is_read=True)
+        elif is_read == "0":
+            queryset = queryset.filter(is_read=False)
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        query_params = self.request.GET.copy()
+        query_params.pop("page", None)
+        context["querystring"] = query_params.urlencode()
+        return context
+
 
 
 class ContactMessageDetailView(StaffRequiredMixin, DetailView):

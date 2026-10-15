@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}
+Mis academias favoritas | Academy Hub
+{% endblock %}
+{% block content %}
+<h1>Mis academias favoritas</h1>
+{% for favorite in favorites %}
+{% with academy=favorite.academy %}
+<article>
+    {% if academy.logo %}
+    <img src="{{ academy.logo.url }}" alt="{{ academy.name }}" width="150">
+    {% endif %}
+    <h2>
+        <a href="{% url 'academies:detail' academy.slug %}">
+            {{ academy.name }}
+        </a>
+    </h2>
+    <p>{{ academy.city }}</p>
+</article>
+<hr>
+{% endwith %}
+{% empty %}
+<p>No tienes academias favoritas.</p>
+{% endfor %}
+{% if is_paginated %}
+<nav>
+    {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+    {% endif %}
+    <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+    {% endif %}
+</nav>
+{% endif %}
+{% endblock %}

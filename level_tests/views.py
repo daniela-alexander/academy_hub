@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
+from django.db.models import Q
 
 from .forms import LevelTestAttemptForm, LevelTestForm
 from .models import LevelTest, LevelTestAttempt
@@ -21,10 +22,31 @@ class LevelTestListView(ListView):
     model = LevelTest
     template_name = "level_tests/level_test_list.html"
     context_object_name = "level_tests"
+    paginate_by = 12
 
     def get_queryset(self):
-        return LevelTest.objects.filter(is_active=True).select_related("course")
+        queryset = (
+            LevelTest.objects
+            .filter(is_active=True)
+            .select_related("course", "course__academy")
+)
+        query = self.request.GET.get("q", "").strip()
+        if query:
+            queryset = queryset.filter(
+                Q(title__icontains=query) | Q(description__icontains=query)
+)
+        course_id = self.request.GET.get("course")
+        if course_id:
+            queryset = queryset.filter(course_id=course_id)
 
+        return queryset
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        query_params = self.request.GET.copy()
+        query_params.pop("page", None)
+        context["querystring"] = query_params.urlencode()
+        return context
 
 class LevelTestDetailView(DetailView):
     model = LevelTest

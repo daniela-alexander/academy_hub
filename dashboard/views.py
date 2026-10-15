@@ -1,10 +1,13 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView
 
-from courses.models import Course
+from courses.models import Course, CourseStatus
 from enrollments.models import Enrollment
 from payments.models import Payment
 from reviews.models import CourseReview
+
+from django.db.models import Count, Avg
+
 
 
 class DashboardView(LoginRequiredMixin, TemplateView):
@@ -23,16 +26,26 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         if user.is_staff:
             context["total_courses"] = Course.objects.count()
             context["total_enrollments"] = Enrollment.objects.count()
+            context["total_reviews"] = CourseReview.objects.count()
+            context["avg_rating"] = (
+                CourseReview.objects.aggregate(avg=Avg("rating"))["avg"] or 0
+            )
 
         elif user.is_academy:
             context["my_courses"] = Course.objects.filter(academy__owner=user)
             context["my_enrollments"] = Enrollment.objects.filter(
                 convocatoria__course__academy__owner=user
             )
+            context["my_courses_count"] = context["my_courses"].count()
+            context["published_courses_count"] = context["my_courses"].filter(
+                status=CourseStatus.PUBLISHED
+            ).count()
+            context["enrollments_count"] = context["my_enrollments"].count()
 
         else:
             context["my_enrollments"] = Enrollment.objects.filter(student=user)
             context["my_payments"] = Payment.objects.filter(enrollment__student=user)
             context["my_reviews"] = CourseReview.objects.filter(student=user)
+            context["enrollments_count"] = context["my_enrollments"].count()
 
         return context

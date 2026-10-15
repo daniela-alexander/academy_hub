@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}
+Mis cursos favoritos | Academy Hub
+{% endblock %}
+
+{% block content %}
+
+<h1>Mis cursos favoritos</h1>
+
+{% for favorite in favorites %}
+
+{% with course=favorite.course %}
+
+<article>
+
+    {% if course.primary_image %}
+    <img src="{{ course.primary_image.image.url }}" alt="{{ course.title }}" width="200">
+    {% endif %}
+
+    <h2>
+        <a href="{{ course.get_absolute_url }}">
+            {{ course.title }}
+        </a>
+    </h2>
+
+    <p>{{ course.academy.name }}</p>
+
+</article>
+
+<hr>
+
+{% endwith %}
+
+{% empty %}
+
+<p>No tienes cursos favoritos.</p>
+
+{% endfor %}
+
+{% if is_paginated %}
+<nav>
+    {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+    {% endif %}
+    <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+    {% endif %}
+</nav>
+{% endif %}
+
+{% endblock %}

@@ -133,10 +133,65 @@ class AcademyReviewDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteVie
 
 
 class MyReviewListView(LoginRequiredMixin, ListView):
+    model = CourseReview
     template_name = "reviews/my_reviews.html"
     context_object_name = "reviews"
+    paginate_by = 10
 
     def get_queryset(self):
-        return CourseReview.objects.filter(
-            student=self.request.user
-        ).select_related("course")
+        queryset = (
+            CourseReview.objects
+            .filter(student=self.request.user)
+            .select_related("course")
+            .order_by("-created_at")
+        )
+
+        rating = self.request.GET.get("rating")
+        if rating:
+            queryset = queryset.filter(rating=rating)
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        query_params = self.request.GET.copy()
+        query_params.pop("page", None)
+        context["querystring"] = query_params.urlencode()
+        return context
+
+class CourseReviewListView(ListView):
+    model = CourseReview
+    template_name = "reviews/course_review_list.html"
+    context_object_name = "reviews"
+    paginate_by = 20
+
+    def get_queryset(self):
+        queryset = (
+            CourseReview.objects.filter(is_published=True)
+            .select_related("student", "course", "course__academy")
+        )
+
+        course_id = self.request.GET.get("course")
+        if course_id:
+            queryset = queryset.filter(course_id=course_id)
+
+        rating = self.request.GET.get("rating")
+        if rating:
+            queryset = queryset.filter(rating=rating)
+
+        ordering = self.request.GET.get("ordering", "newest")
+        if ordering == "oldest":
+            queryset = queryset.order_by("created_at")
+        elif ordering == "best":
+            queryset = queryset.order_by("-rating", "-created_at")
+        else:
+            queryset = queryset.order_by("-created_at")
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        query_params = self.request.GET.copy()
+        query_params.pop("page", None)
+        context["querystring"] = query_params.urlencode()
+        return context

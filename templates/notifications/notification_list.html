@@ -14,46 +14,91 @@ Notificaciones | Academy Hub
     </a>
 </p>
 
+<form method="get" action="{% url 'notifications:list' %}">
+
+    <p>
+        <select name="is_read">
+            <option value="">Todas</option>
+            <option value="0" {% if request.GET.is_read == "0" %}selected{% endif %}>No leídas</option>
+            <option value="1" {% if request.GET.is_read == "1" %}selected{% endif %}>Leídas</option>
+        </select>
+    </p>
+
+    <p>
+        <select name="type">
+            <option value="">Todos los tipos</option>
+            {% for value, label in types %}
+                <option value="{{ value }}"
+                    {% if request.GET.type == value %}selected{% endif %}>
+                    {{ label }}
+                </option>
+            {% endfor %}
+        </select>
+    </p>
+
+    <button type="submit">Filtrar</button>
+    <a href="{% url 'notifications:list' %}">Limpiar</a>
+
+</form>
+
 {% for notification in notifications %}
 
-<article>
+    <article>
 
-    <h2>{{ notification.title }}</h2>
+        <h2>{{ notification.title }}</h2>
 
-    <p>{{ notification.message }}</p>
+        <p>{{ notification.message }}</p>
 
-    <p>
-        Tipo: {{ notification.get_type_display }}
-    </p>
+        <p>Tipo: {{ notification.get_type_display }}</p>
 
-    <p>
-        Fecha: {{ notification.created_at }}
-    </p>
+        <p>Fecha: {{ notification.created_at }}</p>
 
-    {% if notification.url %}
-    <p>
-        <a href="{{ notification.url }}">
-            Ver detalle
-        </a>
-    </p>
-    {% endif %}
+        {% if notification.url %}
+            <p>
+                <a href="{{ notification.url }}">Ver detalle</a>
+            </p>
+        {% endif %}
 
-    {% if not notification.is_read %}
-    <p>
-        <a href="{% url 'notifications:mark_as_read' notification.pk %}">
-            Marcar como leída
-        </a>
-    </p>
-    {% endif %}
+        {% if not notification.is_read %}
+            <p>
+                <a href="{% url 'notifications:mark_as_read' notification.pk %}">
+                    Marcar como leída
+                </a>
+            </p>
+        {% endif %}
 
-</article>
+    </article>
 
-<hr>
+    <hr>
 
 {% empty %}
 
-<p>No tienes notificaciones.</p>
+    <p>No tienes notificaciones que coincidan con los filtros.</p>
 
 {% endfor %}
+
+{% if is_paginated %}
+
+    <nav aria-label="Paginación de notificaciones">
+
+        {% if page_obj.has_previous %}
+            <a href="?{{ querystring }}&page={{ page_obj.previous_page_number }}">
+                Anterior
+            </a>
+        {% endif %}
+
+        <span>
+            Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?{{ querystring }}&page={{ page_obj.next_page_number }}">
+                Siguiente
+            </a>
+        {% endif %}
+
+    </nav>
+
+{% endif %}
 
 {% endblock %}

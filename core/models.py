@@ -1,6 +1,7 @@
 from django.db import models
 
 
+
 class ContactMessage(models.Model):
     """
     Mensaje enviado desde el formulario de contacto.

@@ -5,6 +5,15 @@
 {% block content %}
 <h1>Mensajes de contacto</h1>
 
+<form method="get">
+    <select name="is_read">
+        <option value="">Todos</option>
+        <option value="0" {% if request.GET.is_read == "0" %}selected{% endif %}>No leídos</option>
+        <option value="1" {% if request.GET.is_read == "1" %}selected{% endif %}>Leídos</option>
+    </select>
+    <button type="submit">Filtrar</button>
+</form>
+
 {% if messages_list %}
 <table>
     <thead>
@@ -36,13 +45,13 @@
 </table>
 
 {% if is_paginated %}
-<nav class="pagination">
+<nav>
     {% if page_obj.has_previous %}
-    <a href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+    <a href="?{{ querystring }}&page={{ page_obj.previous_page_number }}">Anterior</a>
     {% endif %}
     <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
     {% if page_obj.has_next %}
-    <a href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+    <a href="?{{ querystring }}&page={{ page_obj.next_page_number }}">Siguiente</a>
     {% endif %}
 </nav>
 {% endif %}

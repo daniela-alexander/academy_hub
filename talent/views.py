@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
+from django.core.paginator import Paginator
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
 from .forms import CompetenceForm, PassportEntryForm, TalentPassportForm
@@ -36,12 +37,31 @@ class CompetenceUpdateView(StaffRequiredMixin, UpdateView):
 class MyPassportView(LoginRequiredMixin, DetailView):
     template_name = "talent/passport_detail.html"
     context_object_name = "passport"
+    paginate_by = 20
 
     def get_object(self):
         passport, _ = TalentPassport.objects.get_or_create(
             student=self.request.user
         )
         return passport
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        entries = (
+            self.object.entries
+            .select_related("competence")
+            .order_by("-obtained_at")
+        )
+
+        paginator = Paginator(entries, self.paginate_by)
+        page_number = self.request.GET.get("page")
+        page_obj = paginator.get_page(page_number)
+
+        context["page_obj"] = page_obj
+        context["entries"] = page_obj.object_list
+
+        return context
 
 
 class MyPassportEditView(LoginRequiredMixin, UpdateView):

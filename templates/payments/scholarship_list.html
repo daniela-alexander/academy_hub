@@ -14,39 +14,75 @@ Mis becas | Academy Hub
     </a>
 </p>
 
+<form method="get" action="{% url 'payments:scholarship_list' %}">
+    <p>
+        <select name="status">
+            <option value="">Todos los estados</option>
+            {% for value, label in statuses %}
+                <option value="{{ value }}"
+                    {% if request.GET.status == value %}selected{% endif %}>
+                    {{ label }}
+                </option>
+            {% endfor %}
+        </select>
+    </p>
+    <button type="submit">Filtrar</button>
+    <a href="{% url 'payments:scholarship_list' %}">Limpiar</a>
+</form>
+
 {% for scholarship in scholarships %}
 
-<article>
+    <article>
 
-    <p>
-        Inscripción:
-        {{ scholarship.enrollment }}
-    </p>
+        <p>
+            Inscripción:
+            {{ scholarship.enrollment }}
+        </p>
 
-    <p>
-        Estado: {{ scholarship.get_status_display }}
-    </p>
+        <p>
+            Estado: {{ scholarship.get_status_display }}
+        </p>
 
-    {% if scholarship.amount %}
-    <p>
-        Importe concedido: {{ scholarship.amount }} €
-    </p>
-    {% endif %}
+        {% if scholarship.amount %}
+            <p>Importe concedido: {{ scholarship.amount }} €</p>
+        {% endif %}
 
-    {% if scholarship.reason %}
-    <p>
-        Motivo: {{ scholarship.reason }}
-    </p>
-    {% endif %}
+        {% if scholarship.reason %}
+            <p>Motivo: {{ scholarship.reason }}</p>
+        {% endif %}
 
-</article>
+    </article>
 
-<hr>
+    <hr>
 
 {% empty %}
 
-<p>No has solicitado ninguna beca.</p>
+    <p>No has solicitado ninguna beca.</p>
 
 {% endfor %}
+
+{% if is_paginated %}
+
+    <nav aria-label="Paginación de becas">
+
+        {% if page_obj.has_previous %}
+            <a href="?{{ querystring }}&page={{ page_obj.previous_page_number }}">
+                Anterior
+            </a>
+        {% endif %}
+
+        <span>
+            Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?{{ querystring }}&page={{ page_obj.next_page_number }}">
+                Siguiente
+            </a>
+        {% endif %}
+
+    </nav>
+
+{% endif %}
 
 {% endblock %}

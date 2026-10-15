@@ -18,7 +18,7 @@ class MultipleFileField(forms.ImageField):
             return data
         if isinstance(data, (list, tuple)):
             if len(data) > 8:
-                raise ValidationError("Se permiten un máximo de 8 imágenes.")
+                raise ValidationError("Se permiten un maximo de 8 imagenes.")
             result = []
             for file in data:
                 cleaned = super().clean(file, initial)
@@ -29,13 +29,13 @@ class MultipleFileField(forms.ImageField):
 
 def validate_image_size(file):
     if file.size > 5 * 1024 * 1024:
-        raise ValidationError("El tamaño máximo permitido es 5 MB.")
+        raise ValidationError("El tamano maximo permitido es 5 MB.")
     return file
 
 
 def validate_image_count(files):
     if len(files) > 8:
-        raise ValidationError("Se permiten un máximo de 8 imágenes.")
+        raise ValidationError("Se permiten un maximo de 8 imagenes.")
     return files
 
 

@@ -1,4 +1,4 @@
-﻿{% extends 'base.html' %}
+{% extends 'base.html' %}
 
 {% block title %}
 Reseñas de cursos | Academy Hub
@@ -29,7 +29,7 @@ Reseñas de cursos | Academy Hub
 </form>
 
 <ul>
-  {% for review in object_list %}
+  {% for review in reviews %}
     <li>
       <strong>{{ review.course.title }}</strong> - {{ review.rating }}/5 por {{ review.student.username }}
       {% if review.comment %}<p>{{ review.comment }}</p>{% endif %}
