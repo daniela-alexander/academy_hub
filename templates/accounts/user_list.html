@@ -1,0 +1,33 @@
+﻿{% extends 'base.html' %}
+{% block title %}Usuarios | Academy Hub{% endblock %}
+{% block content %}
+<h1>Usuarios</h1>
+<form method='get'>
+  <input type='text' name='q' value='{{ request.GET.q }}' placeholder='Buscar usuario...'>
+  <select name='role'>
+    <option value=''>Todos</option>
+    <option value='academy' {% if request.GET.role == 'academy' %}selected{% endif %}>Academia</option>
+    <option value='student' {% if request.GET.role == 'student' %}selected{% endif %}>Estudiante</option>
+    <option value='staff' {% if request.GET.role == 'staff' %}selected{% endif %}>Staff</option>
+  </select>
+  <button type='submit'>Filtrar</button>
+</form>
+<ul>
+  {% for user in users %}
+    <li>{{ user.username }} - {{ user.email }}</li>
+  {% empty %}
+    <li>No hay usuarios.</li>
+  {% endfor %}
+</ul>
+{% if is_paginated %}
+  <div>
+    {% if page_obj.has_previous %}
+      <a href='?{{ querystring }}&amp;page={{ page_obj.previous_page_number }}'>Anterior</a>
+    {% endif %}
+    <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+      <a href='?{{ querystring }}&amp;page={{ page_obj.next_page_number }}'>Siguiente</a>
+    {% endif %}
+  </div>
+{% endif %}
+{% endblock %}

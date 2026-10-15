@@ -1,0 +1,28 @@
+﻿{% extends 'base.html' %}
+{% block title %}Búsqueda global | Academy Hub{% endblock %}
+{% block content %}
+<h1>Búsqueda global</h1>
+<form method='get'>
+  <input type='text' name='q' value='{{ q }}' placeholder='Buscar...'>
+  <button type='submit'>Buscar</button>
+</form>
+{% if results %}
+  <ul>
+    {% for item in results %}
+      <li>
+        {% if item.type == 'course' %}
+          <strong>Curso:</strong> {{ item.obj.title }} - {{ item.obj.academy.name }}
+        {% elif item.type == 'academy' %}
+          <strong>Academia:</strong> {{ item.obj.name }}
+        {% elif item.type == 'teacher' %}
+          <strong>Profesor:</strong> {{ item.obj.first_name }} {{ item.obj.last_name }} - {{ item.obj.specialty }}
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  {% if q %}
+    <p>No se encontraron resultados.</p>
+  {% endif %}
+{% endif %}
+{% endblock %}

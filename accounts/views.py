@@ -8,7 +8,7 @@ from django.contrib.auth.mixins import (
     LoginRequiredMixin,
     UserPassesTestMixin,
 )
-from django.db import models
+from django.db.models import Q
 from django.shortcuts import redirect, render
 from django.views.generic import DetailView, ListView
 
@@ -117,10 +117,27 @@ class UserListView(StaffRequiredMixin, ListView):
 
     def get_queryset(self):
         queryset = User.objects.all().order_by("-created_at")
-        q = self.request.GET.get("q")
+        q = self.request.GET.get("q", "").strip()
         if q:
             queryset = queryset.filter(
-                models.Q(username__icontains=q)
-                | models.Q(email__icontains=q)
+                Q(username__icontains=q)
+                | Q(email__icontains=q)
+                | Q(first_name__icontains=q)
+                | Q(last_name__icontains=q)
             )
+        role = self.request.GET.get("role")
+        if role == "academy":
+            queryset = queryset.filter(is_academy=True)
+        elif role == "student":
+            queryset = queryset.filter(is_student=True)
+        elif role == "staff":
+            queryset = queryset.filter(is_staff=True)
         return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        querystring = self.request.GET.copy()
+        if "page" in querystring:
+            querystring.pop("page")
+        context["querystring"] = querystring.urlencode()
+        return context
