@@ -114,3 +114,19 @@ class CourseReviewListTests(TestCase):
             {"rating": "5"},
         )
         self.assertContains(response, "Excelente")
+
+
+
+def test_my_reviews_filter_by_rating(self):
+    self.client.force_login(self.student)
+    CourseReview.objects.create(
+        student=self.student, course=self.course, rating=5,
+    )
+    CourseReview.objects.create(
+        student=self.student, course=self.course2, rating=2,
+    )
+    response = self.client.get(
+        reverse("reviews:mine"),
+        {"rating": "5"},
+    )
+    self.assertContains(response, "5/5")

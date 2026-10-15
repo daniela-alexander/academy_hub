@@ -3,6 +3,7 @@ from core.test_base import VerboseTestCase
 from django.urls import reverse
 
 from .models import Discount, Scholarship
+from reviews.models import CourseReview
 
 User = get_user_model()
 
@@ -40,3 +41,18 @@ class DiscountTests(VerboseTestCase):
         self.client.force_login(student)
         response = self.client.get(reverse("payments:discount_create"))
         self.assertEqual(response.status_code, 403)
+
+
+def test_my_reviews_filter_by_rating(self):
+    self.client.force_login(self.student)
+    CourseReview.objects.create(
+        student=self.student, course=self.course, rating=5,
+    )
+    CourseReview.objects.create(
+        student=self.student, course=self.course2, rating=2,
+    )
+    response = self.client.get(
+        reverse("reviews:mine"),
+        {"rating": "5"},
+    )
+    self.assertContains(response, "5/5")

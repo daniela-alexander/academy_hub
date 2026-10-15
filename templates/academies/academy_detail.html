@@ -58,5 +58,20 @@
         <p>No hay cursos publicados.</p>
         {% endif %}
     </section>
+    {% if user.is_authenticated and academy.owner_id != user.pk %}
+    <form method="post"
+          action="{% url 'academies:toggle_favorite' academy.slug %}">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        {% if is_favorite %}
+            <button type="submit">Quitar de favoritos</button>
+        {% else %}
+            <button type="submit">Añadir a favoritos</button>
+        {% endif %}
+    </form>
+{% endif %}
+
+<p>{{ favorite_count }} usuarios han guardado esta academia.</p>
+
 </article>
 {% endblock %}

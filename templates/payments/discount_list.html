@@ -14,49 +14,83 @@ Descuentos | Academy Hub
     </a>
 </p>
 
+<form method="get" action="{% url 'payments:discount_list' %}">
+
+    <p>
+        <input type="search"
+               name="q"
+               value="{{ request.GET.q }}"
+               placeholder="Buscar por código o descripción...">
+    </p>
+
+    <p>
+        <select name="is_active">
+            <option value="">Todos</option>
+            <option value="1" {% if request.GET.is_active == "1" %}selected{% endif %}>Activos</option>
+            <option value="0" {% if request.GET.is_active == "0" %}selected{% endif %}>Inactivos</option>
+        </select>
+    </p>
+
+    <button type="submit">Filtrar</button>
+    <a href="{% url 'payments:discount_list' %}">Limpiar</a>
+
+</form>
+
 {% for discount in discounts %}
 
-<article>
+    <article>
 
-    <h2>{{ discount.code }}</h2>
+        <h2>{{ discount.code }}</h2>
 
-    <p>{{ discount.description }}</p>
+        <p>{{ discount.description }}</p>
 
-    <p>
-        Tipo: {{ discount.get_discount_type_display }}
-    </p>
+        <p>Tipo: {{ discount.get_discount_type_display }}</p>
 
-    <p>
-        Valor: {{ discount.value }}
-    </p>
+        <p>Valor: {{ discount.value }}</p>
 
-    <p>
-        Activo:
-        {% if discount.is_active %}
-        Sí
-        {% else %}
-        No
-        {% endif %}
-    </p>
+        <p>
+            Activo:
+            {% if discount.is_active %}Sí{% else %}No{% endif %}
+        </p>
 
-    <p>
-        <a href="{% url 'payments:discount_update' discount.pk %}">
-            Editar
-        </a>
-        |
-        <a href="{% url 'payments:discount_delete' discount.pk %}">
-            Eliminar
-        </a>
-    </p>
+        <p>
+            <a href="{% url 'payments:discount_update' discount.pk %}">Editar</a>
+            |
+            <a href="{% url 'payments:discount_delete' discount.pk %}">Eliminar</a>
+        </p>
 
-</article>
+    </article>
 
-<hr>
+    <hr>
 
 {% empty %}
 
-<p>No hay descuentos activos.</p>
+    <p>No hay descuentos que coincidan con los filtros.</p>
 
 {% endfor %}
+
+{% if is_paginated %}
+
+    <nav aria-label="Paginación de descuentos">
+
+        {% if page_obj.has_previous %}
+            <a href="?{{ querystring }}&page={{ page_obj.previous_page_number }}">
+                Anterior
+            </a>
+        {% endif %}
+
+        <span>
+            Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?{{ querystring }}&page={{ page_obj.next_page_number }}">
+                Siguiente
+            </a>
+        {% endif %}
+
+    </nav>
+
+{% endif %}
 
 {% endblock %}

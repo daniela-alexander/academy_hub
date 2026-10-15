@@ -3,6 +3,7 @@
 {% block title %}Mis inscripciones{% endblock %}
 
 {% block content %}
+
 <form method="get">
     <select name="status">
         <option value="">Todos los estados</option>
@@ -12,18 +13,11 @@
     </select>
     <button type="submit">Filtrar</button>
 </form>
-{% if is_paginated %}
-<nav>
-    {% if page_obj.has_previous %}
-    <a href="?{{ querystring }}&page={{ page_obj.previous_page_number }}">Anterior</a {% endif %} <span>Página {{
-    page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
-    {% if page_obj.has_next %}
-    <a href="?{{ querystring }}&page={{ page_obj.next_page_number }}">Siguiente</a>
-    {% endif %}
-</nav>
-{% endif %}
 
 <h1>Mis inscripciones</h1>
+
+
+
 
 {% if enrollments %}
 <table>
@@ -55,5 +49,17 @@
 </table>
 {% else %}
 <p>No tienes inscripciones todavía.</p>
+{% endif %}
+
+
+{% if is_paginated %}
+<nav>
+    {% if page_obj.has_previous %}
+    <a href="?{{ querystring }}&page={{ page_obj.previous_page_number }}">Anterior</a {% endif %} <span>Página {{
+    page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+    <a href="?{{ querystring }}&page={{ page_obj.next_page_number }}">Siguiente</a>
+    {% endif %}
+</nav>
 {% endif %}
 {% endblock %}

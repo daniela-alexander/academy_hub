@@ -23,16 +23,7 @@ Pagos | Academy Hub
     </select>
     <button type="submit">Filtrar</button>
 </form>
-{% if is_paginated %}
-<nav>
-    {% if page_obj.has_previous %}
-    <a href="?{{ querystring }}&page={{ page_obj.previous_page_number }}">Anterior</a {% endif %} <span>Página {{
-    page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
-    {% if page_obj.has_next %}
-    <a href="?{{ querystring }}&page={{ page_obj.next_page_number }}">Siguiente</a>
-    {% endif %}
-</nav>
-{% endif %}
+
 
 {% for payment in payments %}
 
@@ -77,5 +68,16 @@ Pagos | Academy Hub
 <p>No hay pagos registrados.</p>
 
 {% endfor %}
+
+{% if is_paginated %}
+<nav>
+    {% if page_obj.has_previous %}
+    <a href="?{{ querystring }}&page={{ page_obj.previous_page_number }}">Anterior</a {% endif %} <span>Página {{
+    page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+    <a href="?{{ querystring }}&page={{ page_obj.next_page_number }}">Siguiente</a>
+    {% endif %}
+</nav>
+{% endif %}
 
 {% endblock %}
