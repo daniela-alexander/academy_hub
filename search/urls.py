@@ -6,4 +6,5 @@ app_name = "search"
 
 urlpatterns = [
     path("", views.CourseSearchView.as_view(), name="course_search"),
+    path("global/", views.GlobalSearchView.as_view(), name="global"),
 ]
