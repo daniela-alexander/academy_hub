@@ -38,4 +38,9 @@ urlpatterns = [
         views.AcademyReviewDeleteView.as_view(),
         name="academy_delete",
     ),
+    path(
+        "course-reviews/",
+        views.CourseReviewListView.as_view(),
+        name="course_review_list",
+),
 ]

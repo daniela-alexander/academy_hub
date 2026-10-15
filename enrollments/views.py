@@ -37,14 +37,29 @@ class EnrollmentListView(LoginRequiredMixin, ListView):
     model = Enrollment
     template_name = "enrollments/my_enrollment_list.html"
     context_object_name = "enrollments"
+    paginate_by = 10
 
     def get_queryset(self):
-        return (
+        queryset = (
             Enrollment.objects
             .filter(student=self.request.user)
             .select_related("convocatoria", "convocatoria__course")
             .order_by("-created_at")
         )
+
+        status = self.request.GET.get("status")
+        if status:
+            queryset = queryset.filter(status=status)
+
+        return queryset
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["statuses"] = EnrollmentStatus.choices
+        query_params = self.request.GET.copy()
+        query_params.pop("page", None)
+        context["querystring"] = query_params.urlencode()
+        return context
 
 
 class EnrollmentDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
