@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
 from core.test_base import VerboseTestCase
 from django.urls import reverse
-from django.test import TestCase
 
 User = get_user_model()
 
@@ -22,7 +21,7 @@ class LevelTestTests(VerboseTestCase):
         response = self.client.get(reverse("level_tests:create"))
         self.assertEqual(response.status_code, 403)
 
-class LevelTestSearchTests(TestCase):
+class LevelTestSearchTests(VerboseTestCase):
     def test_search_by_title(self):
         response = self.client.get(
             reverse("level_tests:list"),

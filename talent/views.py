@@ -7,6 +7,7 @@ from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
 from .forms import CompetenceForm, PassportEntryForm, TalentPassportForm
 from .models import Competence, TalentPassport
+from courses.models import Category
 
 
 class StaffRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
@@ -18,6 +19,29 @@ class CompetenceListView(StaffRequiredMixin, ListView):
     model = Competence
     template_name = "talent/competence_list.html"
     context_object_name = "competences"
+    paginate_by = 20
+
+    def get_queryset(self):
+        queryset = Competence.objects.filter(is_active=True).select_related("category")
+
+        query = self.request.GET.get("q", "").strip()
+        if query:
+            queryset = queryset.filter(name__icontains=query)
+
+        category_id = self.request.GET.get("category")
+        if category_id:
+            queryset = queryset.filter(category_id=category_id)
+
+        return queryset.order_by("name")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["categories"] = Category.objects.filter(is_active=True)
+        query_params = self.request.GET.copy()
+        query_params.pop("page", None)
+        context["querystring"] = query_params.urlencode()
+        return context
+
 
 
 class CompetenceCreateView(StaffRequiredMixin, CreateView):

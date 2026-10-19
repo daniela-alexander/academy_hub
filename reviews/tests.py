@@ -1,5 +1,4 @@
 from django.contrib.auth import get_user_model
-from django.test import TestCase
 from core.test_base import VerboseTestCase
 from django.urls import reverse
 
@@ -71,7 +70,7 @@ class CourseReviewTests(VerboseTestCase):
         )
         self.assertEqual(response.status_code, 302)
 
-class CourseReviewListTests(TestCase):
+class CourseReviewListTests(VerboseTestCase):
     def setUp(self):
         self.owner = User.objects.create_user(
             username="englishnow",
@@ -117,16 +116,16 @@ class CourseReviewListTests(TestCase):
 
 
 
-def test_my_reviews_filter_by_rating(self):
-    self.client.force_login(self.student)
-    CourseReview.objects.create(
-        student=self.student, course=self.course, rating=5,
-    )
-    CourseReview.objects.create(
-        student=self.student, course=self.course2, rating=2,
-    )
-    response = self.client.get(
-        reverse("reviews:mine"),
-        {"rating": "5"},
-    )
-    self.assertContains(response, "5/5")
+    def test_my_reviews_filter_by_rating(self):
+        self.client.force_login(self.student)
+        CourseReview.objects.create(
+            student=self.student, course=self.course, rating=5,
+        )
+        CourseReview.objects.create(
+            student=self.student, course=self.course2, rating=2,
+        )   
+        response = self.client.get(
+            reverse("reviews:mine"),
+            {"rating": "5"},
+        )
+        self.assertContains(response, "5/5")

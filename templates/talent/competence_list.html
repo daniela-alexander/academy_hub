@@ -8,6 +8,19 @@ Competencias | Academy Hub
 
 <h1>Competencias</h1>
 
+<form method="get">
+    <input type="search" name="q" value="{{ request.GET.q }}" placeholder="Buscar competencia">
+    <select name="category">
+        <option value="">Todas las categorías</option>
+        {% for cat in categories %}
+            <option value="{{ cat.pk }}" {% if request.GET.category == cat.pk|stringformat:"s" %}selected{% endif %}>
+                {{ cat.name }}
+            </option>
+        {% endfor %}
+    </select>
+    <button type="submit">Filtrar</button>
+</form>
+
 <p>
     <a href="{% url 'talent:competence_create' %}">
         Nueva competencia
@@ -45,5 +58,17 @@ Competencias | Academy Hub
 <p>No hay competencias registradas.</p>
 
 {% endfor %}
+
+{% if is_paginated %}
+    <nav>
+        {% if page_obj.has_previous %}
+            <a href="?{{ querystring }}&page={{ page_obj.previous_page_number }}">Anterior</a>
+        {% endif %}
+        <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+            <a href="?{{ querystring }}&page={{ page_obj.next_page_number }}">Siguiente</a>
+        {% endif %}
+    </nav>
+{% endif %}
 
 {% endblock %}

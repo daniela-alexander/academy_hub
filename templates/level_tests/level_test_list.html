@@ -8,6 +8,13 @@ Pruebas de nivel | Academy Hub
 
 <h1>Pruebas de nivel</h1>
 
+<form method="get">
+    <p>
+        <input type="search" name="q" value="{{ request.GET.q }}" placeholder="Buscar pruebas...">
+    </p>
+    <button type="submit">Buscar</button>
+</form>
+
 {% if user.is_authenticated and user.is_academy %}
 <p>
     <a href="{% url 'level_tests:create' %}">
@@ -47,5 +54,17 @@ Pruebas de nivel | Academy Hub
 <p>No hay pruebas de nivel disponibles.</p>
 
 {% endfor %}
+
+{% if is_paginated %}
+    <nav>
+        {% if page_obj.has_previous %}
+            <a href="?{{ querystring }}&page={{ page_obj.previous_page_number }}">Anterior</a>
+        {% endif %}
+        <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+            <a href="?{{ querystring }}&page={{ page_obj.next_page_number }}">Siguiente</a>
+        {% endif %}
+    </nav>
+{% endif %}
 
 {% endblock %}
