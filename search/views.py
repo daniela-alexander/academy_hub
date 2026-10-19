@@ -1,6 +1,7 @@
 from django.db.models import Min, Q
 from django.views.generic import ListView
 
+from academies.models import Academy, Teacher
 from courses.models import Category, Course, CourseLevel, CourseModality, CourseStatus
 from academies.models import Teacher, Academy
 

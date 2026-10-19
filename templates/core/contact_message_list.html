@@ -8,8 +8,8 @@
 <form method="get">
     <select name="is_read">
         <option value="">Todos</option>
-        <option value="0" {% if request.GET.is_read=="0" %}selected{% endif %}>No leídos</option>
-        <option value="1" {% if request.GET.is_read=="1" %}selected{% endif %}>Leídos</option>
+        <option value="0" {% if request.GET.is_read == "0" %}selected{% endif %}>No leídos</option>
+        <option value="1" {% if request.GET.is_read == "1" %}selected{% endif %}>Leídos</option>
     </select>
     <button type="submit">Filtrar</button>
 </form>
