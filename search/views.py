@@ -2,7 +2,7 @@ from django.db.models import Min, Q
 from django.views.generic import ListView
 
 from courses.models import Category, Course, CourseLevel, CourseModality, CourseStatus
-
+from academies.models import Teacher, Academy
 
 class CourseSearchView(ListView):
     template_name = "search/course_search.html"
@@ -77,4 +77,46 @@ class CourseSearchView(ListView):
         context["current_level"] = current_level
         context["current_modality"] = current_modality
 
+        return context
+
+class GlobalSearchView(ListView):
+    template_name = "search/global_search.html"
+    context_object_name = "results"
+    paginate_by = 20
+
+    def get_queryset(self):
+        query = self.request.GET.get("q", "").strip()
+        if not query:
+            return []
+
+        results = list(
+            Course.objects
+            .filter(
+                Q(title__icontains=query) | Q(description__icontains=query),
+                status=CourseStatus.PUBLISHED,
+            )
+            .select_related("academy", "category")[:50]
+        ) + list(
+            Academy.objects
+            .filter(
+                Q(name__icontains=query) | Q(description__icontains=query),
+                is_active=True,
+            )
+            .select_related("owner")[:50]
+        ) + list(
+            Teacher.objects
+            .filter(
+                Q(first_name__icontains=query)
+                | Q(last_name__icontains=query)
+                | Q(specialty__icontains=query),
+                is_active=True,
+            )
+            .select_related("academy")[:50]
+        )
+
+        return results
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["current_q"] = self.request.GET.get("q", "")
         return context

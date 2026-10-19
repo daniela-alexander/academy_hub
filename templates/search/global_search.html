@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}
+Buscador global | Academy Hub
+{% endblock %}
+
+{% block content %}
+
+<h1>Buscar en Academy Hub</h1>
+
+<form method="get">
+    <input type="search" name="q" value="{{ current_q }}" placeholder="Buscar cursos, academias, profesores...">
+    <button type="submit">Buscar</button>
+</form>
+
+{% for item in results %}
+
+    <article>
+
+        {% if item.title %}
+            <h2>
+                <a href="{{ item.get_absolute_url }}">
+                    {{ item.title }}
+                </a>
+            </h2>
+            <p>Curso</p>
+        {% elif item.name %}
+            <h2>
+                <a href="{% url 'academies:detail' item.slug %}">
+                    {{ item.name }}
+                </a>
+            </h2>
+            <p>Academia</p>
+        {% else %}
+            <h2>{{ item }}</h2>
+            <p>Profesor en {{ item.academy.name }}</p>
+        {% endif %}
+
+    </article>
+
+    <hr>
+
+{% empty %}
+
+    {% if current_q %}
+        <p>No se encontraron resultados para "{{ current_q }}".</p>
+    {% else %}
+        <p>Introduce un término de búsqueda.</p>
+    {% endif %}
+
+{% endfor %}
+
+{% endblock %}

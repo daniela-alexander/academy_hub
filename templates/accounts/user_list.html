@@ -1,24 +1,119 @@
-<form method="get">
+{% extends "base.html" %}
+
+{% block title %}
+Usuarios | Academy Hub
+{% endblock %}
+
+{% block content %}
+
+<h1>Usuarios</h1>
+
+<form method="get" action="{% url 'accounts:user_list' %}">
+
     <p>
-        <input type="search" name="q" value="{{ request.GET.q }}" placeholder="Buscar usuario
+        <input type="search"
+               name="q"
+               value="{{ request.GET.q }}"
+               placeholder="Buscar por nombre, apellidos o email...">
     </p>
+
     <p>
-        <select name=" role">
-        <option value="">Todos los roles</option>
-        <option value="academy" {% if request.GET.role=="academy" %}selected{% endif %} <option value="student" {% if
-            request.GET.role=="student" %}selected{% endif %} <option value="staff" {% if request.GET.role=="staff"
-            %}selected{% endif %}>Sta
-            </select>
+        <select name="role">
+            <option value="">Todos los roles</option>
+            <option value="academy" {% if request.GET.role == "academy" %}selected{% endif %}>Academia</option>
+            <option value="student" {% if request.GET.role == "student" %}selected{% endif %}>Alumno</option>
+            <option value="staff" {% if request.GET.role == "staff" %}selected{% endif %}>Staff</option>
+        </select>
     </p>
+
     <button type="submit">Filtrar</button>
+    <a href="{% url 'accounts:user_list' %}">Limpiar filtros</a>
+
 </form>
+
+{% for user_obj in users %}
+
+    <article>
+
+        {% if user_obj.avatar %}
+            <img src="{{ user_obj.avatar.url }}"
+                 alt="Avatar de {{ user_obj.username }}"
+                 width="80">
+        {% endif %}
+
+        <h2>
+            <a href="{% url 'accounts:public_profile' user_obj.username %}">
+                {{ user_obj.username }}
+            </a>
+        </h2>
+
+        <p>
+            <strong>Nombre:</strong>
+            {{ user_obj.first_name }} {{ user_obj.last_name }}
+        </p>
+
+        <p>
+            <strong>Email:</strong>
+            {{ user_obj.email }}
+        </p>
+
+        <p>
+            <strong>Rol:</strong>
+            {% if user_obj.is_academy %}
+                Academia
+            {% elif user_obj.is_student %}
+                Alumno
+            {% elif user_obj.is_staff %}
+                Staff
+            {% else %}
+                Usuario
+            {% endif %}
+        </p>
+
+        {% if user_obj.city %}
+            <p>
+                <strong>Ciudad:</strong>
+                {{ user_obj.city }}
+            </p>
+        {% endif %}
+
+        <p>
+            <strong>Miembro desde:</strong>
+            {{ user_obj.created_at }}
+        </p>
+
+    </article>
+
+    <hr>
+
+{% empty %}
+
+    <p>No hay usuarios que coincidan con los filtros.</p>
+
+{% endfor %}
+
 {% if is_paginated %}
-<nav>
-    {% if page_obj.has_previous %}
-    <a href="?{{ querystring }}&page={{ page_obj.previous_page_number }}">Anterior</a {% endif %} <span>Página {{
-    page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
-    {% if page_obj.has_next %}
-    <a href="?{{ querystring }}&page={{ page_obj.next_page_number }}">Siguiente</a>
-    {% endif %}
-</nav>
+
+    <nav aria-label="Paginación de usuarios">
+
+        {% if page_obj.has_previous %}
+            <a href="?{{ querystring }}&page={{ page_obj.previous_page_number }}">
+                Anterior
+            </a>
+        {% endif %}
+
+        <span>
+            Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?{{ querystring }}&page={{ page_obj.next_page_number }}">
+                Siguiente
+            </a>
+        {% endif %}
+
+    </nav>
+
 {% endif %}
+
+{% endblock %}

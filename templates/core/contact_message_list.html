@@ -43,6 +43,11 @@
         {% endfor %}
     </tbody>
 </table>
+{% endif %}
+{% else %}
+<p>No hay mensajes.</p>
+{% endif %}
+
 
 {% if is_paginated %}
 <nav>
@@ -54,10 +59,5 @@
     <a href="?{{ querystring }}&page={{ page_obj.next_page_number }}">Siguiente</a>
     {% endif %}
 </nav>
-{% endif %}
-</nav>
-{% endif %}
-{% else %}
-<p>No hay mensajes.</p>
 {% endif %}
 {% endblock %}
