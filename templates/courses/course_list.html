@@ -11,16 +11,20 @@ Cursos | Academy Hub
 <form method="get" action="{% url 'courses:list' %}">
 
     <p>
-        <input type="search" name="q" value="{{ request.GET.q }}" placeholder="Buscar cursos...">
+        <input type="search"
+               name="q"
+               value="{{ request.GET.q }}"
+               placeholder="Buscar cursos...">
     </p>
 
     <p>
         <select name="category">
             <option value="">Todas las categorías</option>
             {% for cat in categories %}
-            <option value="{{ cat.slug }}" {% if request.GET.category==cat.slug %}selected{% endif %}>
-                {{ cat.name }}
-            </option>
+                <option value="{{ cat.slug }}"
+                    {% if request.GET.category == cat.slug %}selected{% endif %}>
+                    {{ cat.name }}
+                </option>
             {% endfor %}
         </select>
     </p>
@@ -29,9 +33,10 @@ Cursos | Academy Hub
         <select name="level">
             <option value="">Cualquier nivel</option>
             {% for value, label in levels %}
-            <option value="{{ value }}" {% if request.GET.level==value %}selected{% endif %}>
-                {{ label }}
-            </option>
+                <option value="{{ value }}"
+                    {% if request.GET.level == value %}selected{% endif %}>
+                    {{ label }}
+                </option>
             {% endfor %}
         </select>
     </p>
@@ -40,41 +45,32 @@ Cursos | Academy Hub
         <select name="modality">
             <option value="">Cualquier modalidad</option>
             {% for value, label in modalities %}
-            <option value="{{ value }}" {% if request.GET.modality==value %}selected{% endif %}>
-                {{ label }}
-            </option>
+                <option value="{{ value }}"
+                    {% if request.GET.modality == value %}selected{% endif %}>
+                    {{ label }}
+                </option>
             {% endfor %}
         </select>
     </p>
 
     <p>
-        <input type="number" name="min_price" min="0" step="0.01" placeholder="Precio mínimo"
-            value="{{ request.GET.min_price }}">
-
-        <input type="number" name="max_price" min="0" step="0.01" placeholder="Precio máximo"
-            value="{{ request.GET.max_price }}">
-    </p>
-
-    <p>
         <select name="ordering">
-            <option value="newest" {% if request.GET.ordering=="newest" or not request.GET.ordering %}selected{% endif
-                %}>
+            <option value="newest" {% if request.GET.ordering == "newest" or not request.GET.ordering %}selected{% endif %}>
                 Más recientes
             </option>
-            <option value="price_asc" {% if request.GET.ordering=="price_asc" %}selected{% endif %}>
+            <option value="price_asc" {% if request.GET.ordering == "price_asc" %}selected{% endif %}>
                 Precio: menor a mayor
             </option>
-            <option value="price_desc" {% if request.GET.ordering=="price_desc" %}selected{% endif %}>
+            <option value="price_desc" {% if request.GET.ordering == "price_desc" %}selected{% endif %}>
                 Precio: mayor a menor
             </option>
-            <option value="popular" {% if request.GET.ordering=="popular" %}selected{% endif %}>
+            <option value="popular" {% if request.GET.ordering == "popular" %}selected{% endif %}>
                 Más vistos
             </option>
         </select>
     </p>
 
     <button type="submit">Buscar y filtrar</button>
-
     <a href="{% url 'courses:list' %}">Limpiar filtros</a>
 
 </form>
@@ -122,6 +118,11 @@ Cursos | Academy Hub
         {% endif %}
     </form>
     {% endif %}
+    <p>{{ course.favorite_count }} personas lo han guardado</p>
+{% if course.reviews_avg %}
+    <p>Valoración media: {{ course.reviews_avg|floatformat:1 }}/5</p>
+{% endif %}
+
 
 </article>
 

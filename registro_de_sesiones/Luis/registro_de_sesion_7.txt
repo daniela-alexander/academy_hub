@@ -1,0 +1,107 @@
+PROYECTO: Academy Hub
+SESIÓN: 07
+FASE: Datos y optimización
+TEMA: PostgreSQL, ORM avanzado, constraints, índices y transacciones
+FECHA: 24/10/2026
+HORA DE ENTRADA: 17h
+HORA DE SALIDA: 18h
+DURACIÓN: 1hora
+
+RESPONSABLE: Luis Robert Huertas Araya
+
+OBJETIVO:
+Migrar Academy Hub desde SQLite a PostgreSQL y aprender técnicas de
+integridad, optimización y concurrencia.
+
+TEORÍA:
+- PostgreSQL
+- ORM
+- SQL
+- Constraints
+- Índices simples y compuestos
+- N+1
+- select_related
+- prefetch_related
+- Prefetch
+- annotate
+- aggregate
+- Count, Avg, Min, Max, Sum
+- values, values_list
+- transacciones
+- atomicidad
+- select_for_update
+- race conditions
+- EXPLAIN
+
+IMPLEMENTACIÓN:
+- Base PostgreSQL
+- Usuario PostgreSQL
+- psycopg
+- Variables de entorno
+- Configuración Django
+- Migraciones
+- CheckConstraint
+- Índices simples y compuestos
+- Consultas agregadas
+- Servicios con transacciones
+- Reorganización de tests
+
+ARCHIVOS MODIFICADOS:
+.env
+.env.example
+requirements.txt
+.gitignore
+config/settings/development.py
+config/settings/production.py
+config/settings/testing.py
+
+accounts/models.py
+academies/models.py
+courses/models.py
+enrollments/models.py
+reviews/models.py
+payments/models.py
+talent/models.py
+level_tests/models.py
+notifications/models.py
+evaluations/models.py
+
+enrollments/services.py
+courses/services.py
+academies/services.py
+
+courses/views.py
+academies/views.py
+level_tests/views.py
+dashboard/views.py
+
+<app>/tests/__init__.py
+<app>/tests/test_models.py
+<app>/tests/test_views.py
+<app>/tests/test_services.py
+<app>/tests/test_queries.py
+
+BASE DE DATOS:
+ANTES: SQLite
+DESPUÉS: PostgreSQL
+
+TESTS:
+- constraints
+- servicios
+- annotate/aggregate
+- explain
+
+PROBLEMAS:
+SOLUCIONES:
+
+COMMIT:
+feat: migrate to PostgreSQL and optimize ORM with constraints and services
+
+ESTADO:
+[ ] Pendiente
+[ ] En progreso
+[ ] Completada
+
+SIGUIENTE SESIÓN:
+Django REST Framework: serializers, APIView, generic views, ViewSets,
+routers, permissions, pagination, filtering y documentación de la API.

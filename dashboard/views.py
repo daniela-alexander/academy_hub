@@ -6,7 +6,7 @@ from enrollments.models import Enrollment
 from payments.models import Payment
 from reviews.models import CourseReview
 
-from django.db.models import Count, Avg
+from django.db.models import Count, Avg, Sum
 
 
 
@@ -23,29 +23,28 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         user = self.request.user
 
-        if user.is_staff:
-            context["total_courses"] = Course.objects.count()
-            context["total_enrollments"] = Enrollment.objects.count()
-            context["total_reviews"] = CourseReview.objects.count()
-            context["avg_rating"] = (
-                CourseReview.objects.aggregate(avg=Avg("rating"))["avg"] or 0
-            )
+        context["total_courses"] = Course.objects.count()
+        context["total_enrollments"] = Enrollment.objects.count()
+        context["total_reviews"] = CourseReview.objects.count()
 
-        elif user.is_academy:
+        context["avg_rating"] = (
+            CourseReview.objects.aggregate(avg=Avg("rating"))["avg"] or 0
+        )
+
+        context["total_revenue"] = (
+            Payment.objects.filter(status="paid")
+            .aggregate(total=Sum("amount"))["total"] or 0
+        )
+
+        if user.is_academy:
             context["my_courses"] = Course.objects.filter(academy__owner=user)
             context["my_enrollments"] = Enrollment.objects.filter(
                 convocatoria__course__academy__owner=user
             )
-            context["my_courses_count"] = context["my_courses"].count()
-            context["published_courses_count"] = context["my_courses"].filter(
-                status=CourseStatus.PUBLISHED
-            ).count()
-            context["enrollments_count"] = context["my_enrollments"].count()
 
-        else:
+        elif user.is_student:
             context["my_enrollments"] = Enrollment.objects.filter(student=user)
             context["my_payments"] = Payment.objects.filter(enrollment__student=user)
             context["my_reviews"] = CourseReview.objects.filter(student=user)
-            context["enrollments_count"] = context["my_enrollments"].count()
 
         return context

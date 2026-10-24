@@ -26,7 +26,13 @@ DJANGO_APPS = [
     'django.contrib.staticfiles',
 ]
 
-THIRD_PARTY_APPS = []
+THIRD_PARTY_APPS = [
+    "rest_framework",
+    "django_filters",
+    "drf_spectacular",
+    "corsheaders",
+]
+
 
 LOCAL_APPS = [
     "core",
@@ -42,6 +48,7 @@ LOCAL_APPS = [
     "level_tests",
     "search",
     "dashboard",
+    "api",
 ]
 
 INSTALLED_APPS = (
@@ -51,6 +58,7 @@ INSTALLED_APPS = (
 )
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -178,3 +186,59 @@ LOGIN_URL = "accounts:login"
 LOGIN_REDIRECT_URL = "core:home"
 
 LOGOUT_REDIRECT_URL = "core:home"
+
+
+# ============================================================
+# DJANGO REST FRAMEWORK
+# ============================================================
+
+REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticatedOrReadOnly",
+    ],
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+    ],
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 12,
+    "DEFAULT_FILTER_BACKENDS": [
+        "django_filters.rest_framework.DjangoFilterBackend",
+        "rest_framework.filters.SearchFilter",
+        "rest_framework.filters.OrderingFilter",
+    ],
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+
+# ============================================================
+# DRF SPECTACULAR (OpenAPI / Swagger / ReDoc)
+# ============================================================
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Academy Hub API",
+    "DESCRIPTION": "API REST de Academy Hub: cursos, academias, inscripciones, pagos y talento.",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "COMPONENT_SPLIT_REQUEST": True,
+}
+
+
+# ============================================================
+# CORS (para React + Vite u otros frontends)
+# ============================================================
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]

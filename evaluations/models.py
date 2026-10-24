@@ -35,6 +35,9 @@ class Evaluation(models.Model):
                 name="unique_evaluation_per_enrollment_kind",
             ),
         ]
+        indexes = [
+            models.Index(fields=["enrollment", "kind"]),
+        ]
 
     def __str__(self):
         return f"{self.enrollment} — {self.kind}"

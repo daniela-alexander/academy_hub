@@ -27,6 +27,14 @@ class Discount(models.Model):
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(value__gte=0),
+                name="discount_value_gte_zero",
+            ),
+        ]
+
     def __str__(self):
         return f"{self.code} ({self.value})"
 
@@ -71,6 +79,13 @@ class Scholarship(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(amount__gte=0),
+                name="payment_amount_gte_zero",
+            ),
+        ]   
+
 
     def __str__(self):
         return f"Beca {self.student.username} — {self.status}"
@@ -111,6 +126,9 @@ class Payment(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
-
+        indexes = [
+            models.Index(fields=["enrollment", "status"]),
+            models.Index(fields=["status"]),
+        ]
     def __str__(self):
         return f"Pago {self.enrollment.pk} — {self.amount} ({self.status})"

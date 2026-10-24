@@ -206,7 +206,22 @@ class Course(models.Model):
             models.Index(fields=["modality"]),
             models.Index(fields=["category"]),
             models.Index(fields=["academy"]),
+            models.Index(fields=["status", "-created_at"]),
+            models.Index(fields=["status", "category"]),
+            models.Index(fields=["status", "-views_count"]),
         ]
+
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(views_count__gte=0),
+                name="course_views_count_gte_zero",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(duration_hours__gte=0),
+                name="course_duration_hours_gte_zero",
+            ),
+        ]
+
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -345,7 +360,28 @@ class Convocatoria(models.Model):
             models.Index(fields=["start_date"]),
             models.Index(fields=["is_active"]),
             models.Index(fields=["course"]),
+            models.Index(fields=["course", "is_active"]),
+            models.Index(fields=["start_date", "is_active"]),
         ]
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(price__gt=0),
+                name="convocatoria_price_gt_zero",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(deposit__gte=0),
+                name="convocatoria_deposit_gte_zero",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(reserved_places__gte=0),
+                name="convocatoria_reserved_places_gte_zero",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(enrolled_places__gte=0),
+                name="convocatoria_enrolled_places_gte_zero",
+            ),
+        ]
+
 
     def __str__(self):
         label = self.name or f"{self.start_date}"
@@ -358,7 +394,8 @@ class Convocatoria(models.Model):
 
     @property
     def is_full(self):
-        return self.available_places == 0
+        used = self.reserved_places + self.enrolled_places
+        return used >= self.total_places
 
     @property
     def is_open(self):
@@ -436,6 +473,10 @@ class CourseFavorite(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
+        indexes = [
+            models.Index(fields=["user", "-created_at"]),
+            models.Index(fields=["course"]),
+        ]
         constraints = [
             models.UniqueConstraint(
                 fields=["user", "course"],

@@ -18,10 +18,13 @@
         (<a href="{% url 'courses:category_update' category.slug %}">editar</a>
         | <a href="{% url 'courses:category_delete' category.slug %}">eliminar</a>)
         {% endif %}
+        <p>{{ category.published_courses_count }} cursos publicados</p>
     </li>
     {% endfor %}
 </ul>
 {% else %}
 <p>No hay categorías.</p>
 {% endif %}
+
+
 {% endblock %}
