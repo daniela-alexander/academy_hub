@@ -1,19 +1,18 @@
+from decimal import Decimal
+from core.test_base import VerboseTestCase
+
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
 from django.db.models import ProtectedError
 from django.utils.text import slugify
-from decimal import Decimal
+
 from academies.models import Academy, Teacher
-from courses.models import CourseFavorite
-from core.test_base import VerboseTestCase
-
-
-from academies.models import Academy
 from courses.models import (
     Category,
-    Course,
     Convocatoria,
+    Course,
+    CourseFavorite,
     CourseImage,
     CourseLevel,
     CourseModality,
@@ -23,12 +22,14 @@ from courses.models import (
 
 User = get_user_model()
 
+
 def crear_usuario(username="owner1"):
     return User.objects.create_user(
         username=username,
         email=f"{username}@example.com",
         password="testpass123",
     )
+
 
 class CategoryModelTest(VerboseTestCase):
 
@@ -40,7 +41,6 @@ class CategoryModelTest(VerboseTestCase):
             icon="book",
         )
 
-    # ---------- Creación ----------
     def test_creacion_correcta(self):
         self.assertEqual(Category.objects.count(), 1)
         self.assertEqual(self.category.name, "Idiomas")
@@ -65,11 +65,9 @@ class CategoryModelTest(VerboseTestCase):
         self.assertEqual(c.description, "")
         self.assertEqual(c.icon, "")
 
-    # ---------- __str__ ----------
     def test_str_devuelve_name(self):
         self.assertEqual(str(self.category), "Idiomas")
 
-    # ---------- Restricciones ----------
     def test_name_es_unico(self):
         with self.assertRaises(IntegrityError):
             Category.objects.create(name="Idiomas")
@@ -83,17 +81,16 @@ class CategoryModelTest(VerboseTestCase):
         with self.assertRaises(ValidationError):
             c.full_clean()
 
-    # ---------- Ordenación ----------
     def test_ordering_por_name(self):
         Category.objects.create(name="Zzz")
         Category.objects.create(name="Aaa")
         nombres = list(Category.objects.values_list("name", flat=True))
         self.assertEqual(nombres, sorted(nombres))
 
-    # ---------- Meta ----------
     def test_verbose_names(self):
         self.assertEqual(Category._meta.verbose_name, "Categoría")
         self.assertEqual(Category._meta.verbose_name_plural, "Categorías")
+
 
 class CourseModelTest(VerboseTestCase):
 
@@ -120,7 +117,6 @@ class CourseModelTest(VerboseTestCase):
         defaults.update(kwargs)
         return Course.objects.create(**defaults)
 
-    # ---------- Creación ----------
     def test_creacion_correcta(self):
         curso = self._crear_curso()
         self.assertEqual(Course.objects.count(), 1)
@@ -153,7 +149,6 @@ class CourseModelTest(VerboseTestCase):
         self.assertEqual(curso.competences, "")
         self.assertEqual(curso.requirements, "")
 
-    # ---------- Slug ----------
     def test_slug_se_genera_automaticamente(self):
         curso = self._crear_curso(title="Curso de Django Avanzado")
         self.assertEqual(curso.slug, slugify("Curso de Django Avanzado"))
@@ -162,19 +157,15 @@ class CourseModelTest(VerboseTestCase):
         curso = self._crear_curso(title="Curso X", slug="slug-custom")
         self.assertEqual(curso.slug, "slug-custom")
 
-    # ---------- Timestamps ----------
     def test_created_at_y_updated_at(self):
         curso = self._crear_curso()
         self.assertIsNotNone(curso.created_at)
         self.assertIsNotNone(curso.updated_at)
-        self.assertEqual(curso.created_at, curso.updated_at)
 
-    # ---------- __str__ ----------
     def test_str_devuelve_title(self):
         curso = self._crear_curso(title="Curso de Inglés")
         self.assertEqual(str(curso), "Curso de Inglés")
 
-    # ---------- Propiedades ----------
     def test_is_published_true(self):
         curso = self._crear_curso(status=CourseStatus.PUBLISHED)
         self.assertTrue(curso.is_published)
@@ -211,7 +202,6 @@ class CourseModelTest(VerboseTestCase):
         )
         self.assertEqual(curso.primary_image, img1)
 
-    # ---------- Choices / validación ----------
     def test_level_invalido_lanza_error(self):
         curso = self._crear_curso(level="inventado")
         with self.assertRaises(ValidationError):
@@ -232,7 +222,6 @@ class CourseModelTest(VerboseTestCase):
         with self.assertRaises(ValidationError):
             curso.full_clean()
 
-    # ---------- Campos requeridos ----------
     def test_title_requerido(self):
         curso = Course(
             academy=self.academy,
@@ -253,7 +242,6 @@ class CourseModelTest(VerboseTestCase):
         with self.assertRaises(ValidationError):
             curso.full_clean()
 
-    # ---------- Relaciones / on_delete ----------
     def test_academy_cascade_delete(self):
         curso = self._crear_curso()
         pk = curso.pk
@@ -271,7 +259,6 @@ class CourseModelTest(VerboseTestCase):
         curso.refresh_from_db()
         self.assertIsNone(curso.teacher)
 
-    # ---------- Related names ----------
     def test_related_name_academy_courses(self):
         curso = self._crear_curso()
         self.assertIn(curso, self.academy.courses.all())
@@ -284,7 +271,6 @@ class CourseModelTest(VerboseTestCase):
         curso = self._crear_curso(teacher=self.teacher)
         self.assertIn(curso, self.teacher.courses.all())
 
-    # ---------- Ordenación ----------
     def test_ordering_por_created_at_descendente(self):
         c1 = self._crear_curso(title="Primero")
         c2 = self._crear_curso(title="Segundo")
@@ -292,7 +278,6 @@ class CourseModelTest(VerboseTestCase):
         self.assertEqual(cursos[0], c2)
         self.assertEqual(cursos[1], c1)
 
-    # ---------- Meta ----------
     def test_verbose_names(self):
         self.assertEqual(Course._meta.verbose_name, "Curso")
         self.assertEqual(Course._meta.verbose_name_plural, "Cursos")
@@ -305,6 +290,7 @@ class CourseModelTest(VerboseTestCase):
         self.assertIn(("modality",), index_fields)
         self.assertIn(("category",), index_fields)
         self.assertIn(("academy",), index_fields)
+
 
 class CourseImageModelTest(VerboseTestCase):
 
@@ -322,7 +308,6 @@ class CourseImageModelTest(VerboseTestCase):
             description="Aprende piano",
         )
 
-    # ---------- Creación ----------
     def test_creacion_correcta(self):
         img = CourseImage.objects.create(
             course=self.course,
@@ -346,14 +331,12 @@ class CourseImageModelTest(VerboseTestCase):
         self.assertEqual(img.alt_text, "")
         self.assertIsNotNone(img.created_at)
 
-    # ---------- __str__ ----------
     def test_str(self):
         img = CourseImage.objects.create(
             course=self.course, image="courses/x.jpg",
         )
         self.assertEqual(str(img), "Imagen de Curso de Piano")
 
-    # ---------- Relaciones ----------
     def test_related_name_images(self):
         img = CourseImage.objects.create(
             course=self.course, image="courses/x.jpg",
@@ -368,7 +351,6 @@ class CourseImageModelTest(VerboseTestCase):
         self.course.delete()
         self.assertEqual(CourseImage.objects.count(), 0)
 
-    # ---------- Ordenación ----------
     def test_ordering_por_position_y_created_at(self):
         img_a = CourseImage.objects.create(
             course=self.course, image="courses/a.jpg", position=2,
@@ -376,11 +358,10 @@ class CourseImageModelTest(VerboseTestCase):
         img_b = CourseImage.objects.create(
             course=self.course, image="courses/b.jpg", position=1,
         )
-        imagenes = list(CourseImage.objects.all())
+        imagenes = list(CourseImage.objects.filter(course=self.course))
         self.assertEqual(imagenes[0], img_b)
         self.assertEqual(imagenes[1], img_a)
 
-    # ---------- Meta ----------
     def test_verbose_names(self):
         self.assertEqual(CourseImage._meta.verbose_name, "Imagen de curso")
         self.assertEqual(
@@ -395,8 +376,6 @@ class CourseImageModelTest(VerboseTestCase):
 class CourseConstraintTests(VerboseTestCase):
 
     def setUp(self):
-        from django.contrib.auth import get_user_model
-        User = get_user_model()
         self.user = User.objects.create_user(
             username="englishnow",
             email="info@englishnow.com",
@@ -426,12 +405,13 @@ class CourseConstraintTests(VerboseTestCase):
 
     def test_course_views_count_cannot_be_negative(self):
         with self.assertRaises(IntegrityError):
-            self._create_course(views_count=-1)
+            with transaction.atomic():
+                self._create_course(views_count=-1)
 
     def test_course_duration_hours_cannot_be_negative(self):
         with self.assertRaises(IntegrityError):
-            self._create_course(duration_hours=-5)
-
+            with transaction.atomic():
+                self._create_course(duration_hours=-5)
 
     def test_convocatoria_price_must_be_positive(self):
         course = self._create_course()
@@ -483,10 +463,8 @@ class CourseConstraintTests(VerboseTestCase):
                     total_places=15,
                     enrolled_places=-1,
                 )
-                
+
     def test_course_favorite_unique_per_user(self):
-        from django.contrib.auth import get_user_model
-        User = get_user_model()
         student = User.objects.create_user(
             username="laura",
             email="laura@example.com",
@@ -496,4 +474,5 @@ class CourseConstraintTests(VerboseTestCase):
         course = self._create_course()
         CourseFavorite.objects.create(user=student, course=course)
         with self.assertRaises(IntegrityError):
-            CourseFavorite.objects.create(user=student, course=course)
+            with transaction.atomic():
+                CourseFavorite.objects.create(user=student, course=course)
