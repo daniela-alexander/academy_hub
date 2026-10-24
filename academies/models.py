@@ -103,7 +103,18 @@ class Academy(models.Model):
             models.Index(fields=["city"]),
             models.Index(fields=["is_active"]),
             models.Index(fields=["is_verified"]),
+            models.Index(fields=["is_active", "-created_at"]),
+            models.Index(fields=["city", "is_active"]),
+            models.Index(fields=["-views_count"], name="academy_views_idx"),
         ]
+
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(views_count__gte=0),
+                name="academy_views_count_gte_zero",
+            ),
+        ]
+
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -189,6 +200,7 @@ class Teacher(models.Model):
         indexes = [
             models.Index(fields=["academy"]),
             models.Index(fields=["is_active"]),
+            models.Index(fields=["academy", "is_active"]),
         ]
 
     def __str__(self):
@@ -208,6 +220,11 @@ class AcademyFavorite(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     class Meta:
         ordering = ["-created_at"]
+        indexes = [
+            models.Index(fields=["user", "-created_at"]),
+            models.Index(fields=["academy"]),
+        ]
+
         constraints = [
             models.UniqueConstraint(
                 fields=["user", "academy"],

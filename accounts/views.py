@@ -13,6 +13,7 @@ from django.shortcuts import redirect, render
 from django.views.generic import DetailView, ListView
 
 from .forms import ProfileForm, RegisterForm
+from accounts.presence import is_user_online, get_last_seen
 
 User = get_user_model()
 logger = logging.getLogger(__name__)
@@ -137,6 +138,8 @@ class UserListView(StaffRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["is_online"] = is_user_online(self.object.pk)
+        context["last_seen"] = get_last_seen(self.object.pk)
         query_params = self.request.GET.copy()
         query_params.pop("page", None)
         context["querystring"] = query_params.urlencode()

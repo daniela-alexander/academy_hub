@@ -16,6 +16,14 @@ class LevelTest(models.Model):
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+            condition=models.Q(passing_score__gte=0, passing_score__lte=100),
+            name="leveltest_passing_score_between_0_and_100",
+            ),
+        ]
+
     def __str__(self):
         return f"{self.course.title} — {self.title}"
 
@@ -55,6 +63,17 @@ class LevelTestAttempt(models.Model):
 
     class Meta:
         ordering = ["-started_at"]
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(score__gte=0, score__lte=100),
+                name="leveltestattempt_score_between_0_and_100",
+            ),
+        ]
+        indexes = [
+            models.Index(fields=["student", "-started_at"]),
+            models.Index(fields=["level_test"]),
+        ]
+
 
     def __str__(self):
         return f"{self.student.username} — {self.level_test.title}"

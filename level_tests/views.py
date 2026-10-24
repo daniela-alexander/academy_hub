@@ -7,7 +7,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
-from django.db.models import Q
+from django.db.models import Q, Count
 
 from .forms import LevelTestAttemptForm, LevelTestForm
 from .models import LevelTest, LevelTestAttempt
@@ -29,7 +29,8 @@ class LevelTestListView(ListView):
             LevelTest.objects
             .filter(is_active=True)
             .select_related("course", "course__academy")
-)
+            .annotate(attempts_count=Count("attempts", distinct=True))
+        )
         query = self.request.GET.get("q", "").strip()
         if query:
             queryset = queryset.filter(

@@ -6,7 +6,7 @@ from django.contrib.auth.mixins import (
     UserPassesTestMixin,
 )
 from django.db import transaction
-from django.db.models import F, Q
+from django.db.models import F, Q, Avg, Count
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.http import url_has_allowed_host_and_scheme
@@ -22,6 +22,8 @@ from django.views.generic import (
 
 from .forms import AcademyForm, TeacherForm
 from .models import Academy, AcademyFavorite, Teacher
+
+from academies.cache import invalidate_popular_academies
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +43,12 @@ class AcademyListView(ListView):
             Academy.objects
             .filter(is_active=True)
             .select_related("owner")
-            .prefetch_related("courses")
+            .annotate(
+                courses_count=Count("courses", distinct=True),
+                teachers_count=Count("teachers", distinct=True),
+                favorite_count=Count("favorites", distinct=True),
+                reviews_avg=Avg("reviews__rating"),
+            )
         )
 
         query = self.request.GET.get("q", "").strip()
@@ -118,6 +125,14 @@ class AcademyDetailView(DetailView):
             ).exists()
 
         context["favorite_count"] = self.object.favorites.count()
+
+        context["reviews_stats"] = self.object.reviews.aggregate(
+            avg=Avg("rating"),
+            total=Count("id"),
+        )
+
+        context["courses_count"] = self.object.courses.count()
+
         return context
 
 
@@ -207,6 +222,9 @@ def toggle_academy_favorite(request, slug):
         else:
             messages.success(request, "Academia añadida a favoritos.")
 
+    # Invalidar cache de academias populares
+    invalidate_popular_academies()
+
     return redirect(next_url)
 
 
@@ -225,6 +243,7 @@ class TeacherListView(ListView):
             Teacher.objects
             .filter(is_active=True)
             .select_related("academy")
+            .annotate(courses_count=Count("courses", distinct=True))
         )
 
         query = self.request.GET.get("q", "").strip()

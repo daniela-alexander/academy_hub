@@ -13,4 +13,36 @@
     |
     <a href="{% url 'core:contact' %}">Contacto</a>
 </p>
+
+<h2>Cursos populares</h2>
+
+{% for course in popular_courses %}
+    <article>
+        <h3>
+            <a href="{{ course.get_absolute_url }}">{{ course.title }}</a>
+        </h3>
+        <p>{{ course.academy.name }}</p>
+    </article>
+{% empty %}
+    <p>No hay cursos populares todavía.</p>
+{% endfor %}
+
+<h2>Academias populares</h2>
+
+{% for academy in popular_academies %}
+    <article>
+        <h3>
+            <a href="{% url 'academies:detail' academy.slug %}">
+                {{ academy.name }}
+            </a>
+        </h3>
+        {% if academy.city %}
+            <p>{{ academy.city }}</p>
+        {% endif %}
+        <p>{{ academy.favorite_count }} seguidores</p>
+    </article>
+{% empty %}
+    <p>No hay academias populares todavía.</p>
+{% endfor %}
+
 {% endblock %}

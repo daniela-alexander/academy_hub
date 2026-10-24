@@ -112,18 +112,28 @@ class Enrollment(models.Model):
         verbose_name = "Inscripción"
         verbose_name_plural = "Inscripciones"
         ordering = ["-created_at"]
-        constraints = [
-            models.UniqueConstraint(
-                fields=["student", "convocatoria"],
-                name="unique_student_convocatoria",
-            ),
-        ]
         indexes = [
             models.Index(fields=["status"]),
             models.Index(fields=["payment_status"]),
             models.Index(fields=["student", "status"]),
             models.Index(fields=["convocatoria", "status"]),
+            models.Index(fields=["student", "-created_at"]),
         ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["student", "convocatoria"],
+                name="unique_student_convocatoria",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(amount_paid__gte=0),
+                name="enrollment_amount_paid_gte_zero",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(discount_amount__gte=0),
+                name="enrollment_discount_amount_gte_zero",
+            ),
+        ]
+
 
     def __str__(self):
         return f"{self.student.username} → {self.convocatoria}"
@@ -205,15 +215,21 @@ class WaitlistEntry(models.Model):
         verbose_name = "Lista de espera"
         verbose_name_plural = "Listas de espera"
         ordering = ["position", "created_at"]
+        indexes = [
+            models.Index(fields=["convocatoria", "position"]),
+            models.Index(fields=["student"]),
+        ]
         constraints = [
             models.UniqueConstraint(
                 fields=["student", "convocatoria"],
                 name="unique_waitlist_student_convocatoria",
             ),
+            models.CheckConstraint(
+                condition=models.Q(position__gte=0),
+                name="waitlist_position_gte_zero",
+            ),
         ]
-        indexes = [
-            models.Index(fields=["convocatoria", "position"]),
-        ]
+
 
     def __str__(self):
         return f"#{self.position} {self.student.username} → {self.convocatoria}"

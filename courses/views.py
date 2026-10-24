@@ -1,12 +1,16 @@
 import logging
 
 from django.db import transaction
-from django.db.models import F, Q
+from django.db.models import F, Q, Avg, Count, Prefetch, Max, Min
 from django.shortcuts import get_object_or_404, redirect
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.contrib import messages
+from dashboard.cache import invalidate_global_stats
+from courses.redis_services import increment_course_views
+
+
 from django.contrib.auth.mixins import (
     LoginRequiredMixin,
     UserPassesTestMixin,
@@ -37,7 +41,12 @@ from .models import (
     CourseStatus,
 )
 
+from courses.cache import invalidate_popular_courses
+
+
 logger = logging.getLogger(__name__)
+
+
 
 class CourseListView(ListView):
     model = Course
@@ -50,7 +59,16 @@ class CourseListView(ListView):
             Course.objects
             .filter(status=CourseStatus.PUBLISHED)
             .select_related("academy", "category", "teacher")
-            .prefetch_related("images", "convocatorias")
+            .prefetch_related(
+                Prefetch(
+                    "images",
+                    queryset=CourseImage.objects.order_by("position"),
+                )
+            )
+            .annotate(
+                favorite_count=Count("favorites", distinct=True),
+                reviews_avg=Avg("reviews__rating"),
+            )
         )
 
         query = self.request.GET.get("q", "").strip()
@@ -167,7 +185,7 @@ class CourseCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
                     is_primary=(position == 0),
                     position=position,
                 )
-
+        invalidate_global_stats()
         messages.success(self.request, "Curso publicado correctamente.")
         logger.info(
             "Course created: id=%s user=%s",
@@ -212,6 +230,8 @@ def toggle_course_favorite(request, pk):
         else:
             messages.success(request, "Curso añadido a favoritos.")
 
+    invalidate_popular_courses()
+    
     return redirect(next_url)
 
 
@@ -255,12 +275,13 @@ class CourseDetailView(DetailView):
             views_count=F("views_count") + 1
         )
         course.refresh_from_db(fields=["views_count"])
+        increment_course_views(course.pk)
         return course
-
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["is_favorite"] = False
 
+        context["is_favorite"] = False
         if self.request.user.is_authenticated:
             context["is_favorite"] = CourseFavorite.objects.filter(
                 user=self.request.user,
@@ -268,6 +289,18 @@ class CourseDetailView(DetailView):
             ).exists()
 
         context["favorite_count"] = self.object.favorites.count()
+
+        context["reviews_stats"] = self.object.reviews.aggregate(
+            avg=Avg("rating"),
+            total=Count("id"),
+        )
+
+        context["price_range"] = self.object.convocatorias.filter(
+            is_active=True
+        ).aggregate(
+            min_price=Min("price"),
+            max_price=Max("price"),
+        )
 
         return context
 
@@ -311,6 +344,7 @@ class MyCourseListView(LoginRequiredMixin, ListView):
             Course.objects
             .filter(academy__owner=self.request.user)
             .select_related("academy", "category", "teacher")
+            .annotate(favorite_count=Count("favorites", distinct=True))
         )
 
 
@@ -320,8 +354,17 @@ class CategoryListView(ListView):
     context_object_name = "categories"
 
     def get_queryset(self):
-        return Category.objects.filter(is_active=True)
-
+        return (
+            Category.objects
+            .filter(is_active=True)
+            .annotate(
+                published_courses_count=Count(
+                    "courses",
+                    filter=Q(courses__status=CourseStatus.PUBLISHED),
+                    distinct=True,
+                ),
+            )
+        )
 
 class CategoryDetailView(DetailView):
     model = Category

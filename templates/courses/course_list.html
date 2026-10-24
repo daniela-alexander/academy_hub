@@ -11,16 +11,20 @@ Cursos | Academy Hub
 <form method="get" action="{% url 'courses:list' %}">
 
     <p>
-        <input type="search" name="q" value="{{ request.GET.q }}" placeholder="Buscar cursos...">
+        <input type="search"
+               name="q"
+               value="{{ request.GET.q }}"
+               placeholder="Buscar cursos...">
     </p>
 
     <p>
         <select name="category">
             <option value="">Todas las categorías</option>
             {% for cat in categories %}
-            <option value="{{ cat.slug }}" {% if request.GET.category == cat.slug %}selected{% endif %}>
-                {{ cat.name }}
-            </option>
+                <option value="{{ cat.slug }}"
+                    {% if request.GET.category == cat.slug %}selected{% endif %}>
+                    {{ cat.name }}
+                </option>
             {% endfor %}
         </select>
     </p>
@@ -29,9 +33,10 @@ Cursos | Academy Hub
         <select name="level">
             <option value="">Cualquier nivel</option>
             {% for value, label in levels %}
-            <option value="{{ value }}" {% if request.GET.level == value %}selected{% endif %}>
-                {{ label }}
-            </option>
+                <option value="{{ value }}"
+                    {% if request.GET.level == value %}selected{% endif %}>
+                    {{ label }}
+                </option>
             {% endfor %}
         </select>
     </p>
@@ -40,19 +45,22 @@ Cursos | Academy Hub
         <select name="modality">
             <option value="">Cualquier modalidad</option>
             {% for value, label in modalities %}
-            <option value="{{ value }}" {% if request.GET.modality == value %}selected{% endif %}>
-                {{ label }}
-            </option>
+                <option value="{{ value }}"
+                    {% if request.GET.modality == value %}selected{% endif %}>
+                    {{ label }}
+                </option>
             {% endfor %}
         </select>
     </p>
 
     <p>
-        <input type="number" name="min_price" min="0" step="0.01" placeholder="Precio mínimo"
-            value="{{ request.GET.min_price }}">
+        <input type="number" name="min_price" min="0" step="0.01"
+               placeholder="Precio mínimo"
+               value="{{ request.GET.min_price }}">
 
-        <input type="number" name="max_price" min="0" step="0.01" placeholder="Precio máximo"
-            value="{{ request.GET.max_price }}">
+        <input type="number" name="max_price" min="0" step="0.01"
+               placeholder="Precio máximo"
+               value="{{ request.GET.max_price }}">
     </p>
 
     <p>
@@ -79,75 +87,78 @@ Cursos | Academy Hub
 </form>
 
 {% if user.is_authenticated and user.is_academy %}
-<p>
-    <a href="{% url 'courses:create' %}">Publicar curso</a>
-    |
-    <a href="{% url 'courses:favorites' %}">Mis favoritos</a>
-</p>
+    <p>
+        <a href="{% url 'courses:create' %}">Publicar curso</a>
+        |
+        <a href="{% url 'courses:favorites' %}">Mis favoritos</a>
+    </p>
 {% endif %}
 
 {% for course in courses %}
 
-<article>
+    <article>
 
-    {% if course.primary_image %}
-    <img src="{{ course.primary_image.image.url }}" alt="{{ course.title }}" width="200">
-    {% endif %}
-
-    <h2>
-        <a href="{{ course.get_absolute_url }}">
-            {{ course.title }}
-        </a>
-    </h2>
-
-    <p>Academia: {{ course.academy.name }}</p>
-    <p>Categoría: {{ course.category.name }}</p>
-
-    {% if course.teacher %}
-    <p>Profesor: {{ course.teacher }}</p>
-    {% endif %}
-
-    <p>Nivel: {{ course.get_level_display }}</p>
-    <p>Modalidad: {{ course.get_modality_display }}</p>
-
-    {% if user.is_authenticated and course.academy.owner_id != user.pk %}
-    <form method="post" action="{% url 'courses:toggle_favorite' course.pk %}">
-        {% csrf_token %}
-        <input type="hidden" name="next" value="{{ request.get_full_path }}">
-        {% if course.pk in favorite_course_ids %}
-        <button type="submit">Quitar de favoritos</button>
-        {% else %}
-        <button type="submit">Añadir a favoritos</button>
+        {% if course.primary_image %}
+            <img src="{{ course.primary_image.image.url }}"
+                 alt="{{ course.title }}"
+                 width="200">
         {% endif %}
-    </form>
-    {% endif %}
 
-</article>
+        <h2>
+            <a href="{{ course.get_absolute_url }}">
+                {{ course.title }}
+            </a>
+        </h2>
 
-<hr>
+        <p>Academia: {{ course.academy.name }}</p>
+        <p>Categoría: {{ course.category.name }}</p>
+
+        {% if course.teacher %}
+            <p>Profesor: {{ course.teacher }}</p>
+        {% endif %}
+
+        <p>Nivel: {{ course.get_level_display }}</p>
+        <p>Modalidad: {{ course.get_modality_display }}</p>
+
+        {% if user.is_authenticated and course.academy.owner_id != user.pk %}
+            <form method="post"
+                  action="{% url 'courses:toggle_favorite' course.pk %}">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                {% if course.pk in favorite_course_ids %}
+                    <button type="submit">Quitar de favoritos</button>
+                {% else %}
+                    <button type="submit">Añadir a favoritos</button>
+                {% endif %}
+            </form>
+        {% endif %}
+
+    </article>
+
+    <hr>
 
 {% empty %}
 
-<p>No hay cursos que coincidan con los filtros.</p>
+    <p>No hay cursos que coincidan con los filtros.</p>
 
 {% endfor %}
 
 {% if is_paginated %}
-<nav>
-    {% if page_obj.has_previous %}
-    <a href="?{{ querystring }}&page={{ page_obj.previous_page_number }}">
-        Anterior
-    </a>
-    {% endif %}
+    <nav>
+        {% if page_obj.has_previous %}
+            <a href="?{{ querystring }}&page={{ page_obj.previous_page_number }}">
+                Anterior
+            </a>
+        {% endif %}
 
-    <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+        <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
 
-    {% if page_obj.has_next %}
-    <a href="?{{ querystring }}&page={{ page_obj.next_page_number }}">
-        Siguiente
-    </a>
-    {% endif %}
-</nav>
+        {% if page_obj.has_next %}
+            <a href="?{{ querystring }}&page={{ page_obj.next_page_number }}">
+                Siguiente
+            </a>
+        {% endif %}
+    </nav>
 {% endif %}
 
 {% endblock %}

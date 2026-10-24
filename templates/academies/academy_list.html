@@ -62,6 +62,13 @@ Academias | Academy Hub
 
         <p>{{ academy.city }}</p>
 
+        <p>{{ academy.courses_count }} cursos · {{ academy.teachers_count }} profesores</p>
+<p>{{ academy.favorite_count }} personas la siguen</p>
+{% if academy.reviews_avg %}
+    <p>Valoración media: {{ academy.reviews_avg|floatformat:1 }}/5</p>
+{% endif %}
+
+
         {% if user.is_authenticated and academy.owner_id != user.pk %}
             <form method="post"
                   action="{% url 'academies:toggle_favorite' academy.slug %}">
@@ -74,7 +81,7 @@ Academias | Academy Hub
                 {% endif %}
             </form>
         {% endif %}
-
+            
     </article>
 
     <hr>
@@ -82,6 +89,8 @@ Academias | Academy Hub
 {% empty %}
 
     <p>No hay academias que coincidan con los filtros.</p>
+
+    
 
 {% endfor %}
 

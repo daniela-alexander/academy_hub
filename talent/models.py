@@ -51,12 +51,20 @@ class PassportEntry(models.Model):
 
     class Meta:
         ordering = ["-obtained_at"]
+        indexes = [
+            models.Index(fields=["passport", "-obtained_at"]),
+        ]
         constraints = [
             models.UniqueConstraint(
                 fields=["passport", "competence"],
                 name="unique_passport_competence",
             ),
+            models.CheckConstraint(
+                condition=models.Q(level__gte=1, level__lte=5),
+                name="passportentry_level_between_1_and_5",
+            ),
         ]
+
 
     def __str__(self):
         return f"{self.passport.student.username} — {self.competence.name}"

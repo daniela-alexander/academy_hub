@@ -97,6 +97,20 @@
 </form>
 {% endif %}
 
-<p>{{ favorite_count }} usuarios han guardado este curso.</p>
+<p>{{ favorite_count }} personas han guardado este curso.</p>
+
+<p>
+    Valoración media:
+    {% if reviews_stats.avg %}
+        {{ reviews_stats.avg|floatformat:1 }}/5 ({{ reviews_stats.total }} reseñas)
+    {% else %}
+        Sin reseñas todavía
+    {% endif %}
+</p>
+
+{% if price_range.min_price %}
+    <p>Desde {{ price_range.min_price }} € hasta {{ price_range.max_price }} €</p>
+{% endif %}
+
 
 {% endblock %}

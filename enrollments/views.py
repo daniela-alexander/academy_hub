@@ -18,10 +18,12 @@ from django.views.generic import (
 )
 
 from courses.models import Course
-
+from core.rate_limit import check_rate_limit
 from .models import Enrollment, EnrollmentStatus
 
 from courses.models import Convocatoria
+
+from dashboard.cache import invalidate_global_stats
 
 from .forms import (
     EnrollmentAnswerForm,
@@ -105,10 +107,21 @@ class EnrollmentCreateView(LoginRequiredMixin, CreateView):
         return context
 
     def form_valid(self, form):
+
+        rate_key = f"academyhub:rate:enrollments:{self.request.user.pk}"
+
+        if not check_rate_limit(rate_key, limit=5, window=60):
+            messages.error(
+                self.request,
+                "Has realizado demasiadas inscripciones. Inténtalo más tarde.",
+            )
+            return self.form_invalid(form)
+        
         existing = Enrollment.objects.filter(
             student=self.request.user,
             convocatoria=self.convocatoria,
         ).exists()
+        
         if existing:
             messages.error(
                 self.request,
@@ -134,6 +147,7 @@ class EnrollmentCreateView(LoginRequiredMixin, CreateView):
             return redirect("enrollments:list")
 
         response = super().form_valid(form)
+        invalidate_global_stats()
         messages.success(self.request, "Inscripción enviada correctamente.")
         logger.info(
             "Enrollment created: id=%s student=%s",

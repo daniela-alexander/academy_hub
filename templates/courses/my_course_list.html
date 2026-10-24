@@ -16,6 +16,7 @@
         — {{ course.academy.name }}
         (<a href="{% url 'courses:update' course.pk %}">editar</a>
         | <a href="{% url 'courses:delete' course.pk %}">eliminar</a>)
+        <p>{{ course.favorite_count }} personas lo han guardado</p>
     </li>
     {% endfor %}
 </ul>

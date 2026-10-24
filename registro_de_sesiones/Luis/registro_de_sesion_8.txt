@@ -1,0 +1,109 @@
+PROYECTO: Academy Hub
+SESIÓN: 08
+FASE: API y lógica de negocio
+TEMA: Django REST Framework
+FECHA: 24/10/2026
+HORA DE ENTRADA: 18h
+HORA DE SALIDA: 19:14h
+DURACIÓN: 1hora 14 minutos
+
+RESPONSABLE: Luis Robert Huertas Araya
+
+OBJETIVO:
+Crear una API REST completa de Academy Hub con DRF, filtros,
+permisos, documentación y tests.
+
+TEORÍA:
+- REST, HTTP, JSON, códigos de estado
+- Serializer, ModelSerializer, nested serializers
+- APIView, Generic Views, ViewSet, ModelViewSet
+- Router
+- Autenticación, permisos, permisos de objeto
+- Filtering, Search, Ordering, Pagination
+- OpenAPI, Swagger, ReDoc
+- CORS
+
+IMPLEMENTACIÓN:
+- App api con estructura modular
+- Serializers por app
+- Filtros por app
+- ViewSets por app
+- Autenticación por sesión
+- Acciones personalizadas
+- Routers y URLs
+- Documentación Spectacular
+- CORS para React
+
+ENDPOINTS:
+- /api/v1/auth/register/
+- /api/v1/auth/login/
+- /api/v1/auth/logout/
+- /api/v1/auth/me/
+- /api/v1/auth/change-password/
+- /api/v1/users/
+- /api/v1/academies/ (CRUD + mine + teachers + courses + favorite)
+- /api/v1/teachers/
+- /api/v1/courses/ (CRUD + mine + similar + favorite)
+- /api/v1/categories/
+- /api/v1/course-favorites/
+- /api/v1/enrollments/ (CRUD + mine + academy + approve + enroll)
+- /api/v1/convocatorias/{pk}/reserve/
+- /api/v1/course-reviews/
+- /api/v1/academy-reviews/
+- /api/v1/my-reviews/
+- /api/v1/discounts/
+- /api/v1/payments/ (CRUD + mine)
+- /api/v1/scholarships/ (CRUD + approve + reject)
+- /api/v1/notifications/ (read + read_all)
+- /api/v1/evaluations/ (CRUD + mine + academy)
+- /api/v1/competences/
+- /api/v1/passport/ (mine)
+- /api/v1/passport-entries/
+- /api/v1/level-tests/ (attempt + attempts_mine)
+- /api/v1/stats/
+- /api/schema/
+- /api/docs/
+- /api/redoc/
+
+ARCHIVOS CREADOS:
+api/__init__.py
+api/apps.py
+api/permissions.py
+api/urls.py
+api/serializers/*.py (10)
+api/filters/*.py (4)
+api/views/*.py (12)
+api/tests/*.py (8)
+
+ARCHIVOS MODIFICADOS:
+config/settings/base.py
+config/urls.py
+requirements.txt
+
+TESTS:
+- auth: registro, login, me
+- courses: listado, detalle, crear, permisos, búsqueda, filtros
+- academies: listado, detalle, mine, búsqueda
+- enrollments: crear, mine, reserve
+- reviews: listado, crear, validación rating
+- favorites: crear, propietario no puede, anónimo no puede
+- talent: mine
+- stats: público
+
+COMANDOS:
+pip install djangorestframework django-filter drf-spectacular django-cors-headers
+pip freeze > requirements.txt
+python manage.py check
+python manage.py test
+python manage.py runserver
+
+COMMIT:
+feat: add REST API with DRF, filters, permissions and documentation
+
+ESTADO:
+[ ] Pendiente
+[ ] En progreso
+[X] Completada
+
+PRÓXIMA SESIÓN:
+Ofertas, contraofertas e intercambios (Sesión 9).

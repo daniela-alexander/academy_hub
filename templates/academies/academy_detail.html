@@ -72,6 +72,12 @@
 {% endif %}
 
 <p>{{ favorite_count }} usuarios han guardado esta academia.</p>
+<p>{{ courses_count }} cursos publicados</p>
+<p>{{ favorite_count }} personas la siguen</p>
+{% if reviews_stats.avg %}
+    <p>Valoración media: {{ reviews_stats.avg|floatformat:1 }}/5</p>
+{% endif %}
+
 
 </article>
 {% endblock %}

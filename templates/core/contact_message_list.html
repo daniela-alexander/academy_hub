@@ -1,63 +1,81 @@
 {% extends "base.html" %}
 
-{% block title %}Mensajes de contacto{% endblock %}
+{% block title %}
+Mensajes de contacto | Academy Hub
+{% endblock %}
 
 {% block content %}
+
 <h1>Mensajes de contacto</h1>
 
 <form method="get">
-    <select name="is_read">
-        <option value="">Todos</option>
-        <option value="0" {% if request.GET.is_read == "0" %}selected{% endif %}>No leídos</option>
-        <option value="1" {% if request.GET.is_read == "1" %}selected{% endif %}>Leídos</option>
-    </select>
+
+    <p>
+        <select name="is_read">
+            <option value="">Todos</option>
+            <option value="0" {% if request.GET.is_read == "0" %}selected{% endif %}>No leídos</option>
+            <option value="1" {% if request.GET.is_read == "1" %}selected{% endif %}>Leídos</option>
+        </select>
+    </p>
+
     <button type="submit">Filtrar</button>
+    <a href="{% url 'core:contact_message_list' %}">Limpiar</a>
+
 </form>
 
-{% if messages_list %}
-<table>
-    <thead>
-        <tr>
-            <th>Fecha</th>
-            <th>Nombre</th>
-            <th>Email</th>
-            <th>Asunto</th>
-            <th>Leído</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for msg in messages_list %}
-        <tr>
-            <td>{{ msg.created_at|date:"d/m/Y H:i" }}</td>
-            <td>{{ msg.name }}</td>
-            <td>{{ msg.email }}</td>
-            <td>{{ msg.subject }}</td>
-            <td>{% if msg.is_read %}Sí{% else %}No{% endif %}</td>
-            <td>
-                <a href="{% url 'core:contact_message_detail' msg.pk %}">Ver</a>
-                | <a href="{% url 'core:contact_message_update' msg.pk %}">Editar</a>
-                | <a href="{% url 'core:contact_message_delete' msg.pk %}">Eliminar</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-{% endif %}
-{% else %}
-<p>No hay mensajes.</p>
-{% endif %}
+{% for message in messages_list %}
 
+    <article>
+
+        <h2>{{ message.subject }}</h2>
+
+        <p>
+            <strong>De:</strong>
+            {{ message.name }} ({{ message.email }})
+        </p>
+
+        <p>{{ message.message }}</p>
+
+        <p>
+            <strong>Fecha:</strong>
+            {{ message.created_at }}
+        </p>
+
+        <p>
+            <strong>Estado:</strong>
+            {% if message.is_read %}
+                Leído
+            {% else %}
+                No leído
+            {% endif %}
+        </p>
+
+        <p>
+            <a href="{% url 'core:contact_message_detail' message.pk %}">
+                Ver detalle
+            </a>
+        </p>
+
+    </article>
+
+    <hr>
+
+{% empty %}
+
+    <p>No hay mensajes.</p>
+
+{% endfor %}
 
 {% if is_paginated %}
-<nav>
-    {% if page_obj.has_previous %}
-    <a href="?{{ querystring }}&page={{ page_obj.previous_page_number }}">Anterior</a>
-    {% endif %}
-    <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
-    {% if page_obj.has_next %}
-    <a href="?{{ querystring }}&page={{ page_obj.next_page_number }}">Siguiente</a>
-    {% endif %}
-</nav>
+    <nav>
+        {% if page_obj.has_previous %}
+            <a href="?{{ querystring }}&page={{ page_obj.previous_page_number }}">Anterior</a>
+        {% endif %}
+        <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+            <a href="?{{ querystring }}&page={{ page_obj.next_page_number }}">Siguiente</a>
+        {% endif %}
+    </nav>
 {% endif %}
+
 {% endblock %}
