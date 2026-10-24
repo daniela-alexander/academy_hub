@@ -1,16 +1,15 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView
 
-from courses.models import Course, CourseStatus
+from courses.models import Course
+from dashboard.cache import get_global_stats
 from enrollments.models import Enrollment
 from payments.models import Payment
 from reviews.models import CourseReview
 
-from django.db.models import Count, Avg, Sum
-
-
 
 class DashboardView(LoginRequiredMixin, TemplateView):
+
     def get_template_names(self):
         user = self.request.user
         if user.is_staff:
@@ -23,19 +22,19 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         user = self.request.user
 
-        context["total_courses"] = Course.objects.count()
-        context["total_enrollments"] = Enrollment.objects.count()
-        context["total_reviews"] = CourseReview.objects.count()
+        # ------------------------------------------------------------
+        # 1. Estadísticas globales (CACHEADAS)
+        # ------------------------------------------------------------
+        stats = get_global_stats()
+        context["total_courses"] = stats["total_courses"]
+        context["total_enrollments"] = stats["total_enrollments"]
+        context["total_reviews"] = stats["total_reviews"]
+        context["avg_rating"] = stats["avg_rating"]
+        context["total_revenue"] = stats["total_revenue"]
 
-        context["avg_rating"] = (
-            CourseReview.objects.aggregate(avg=Avg("rating"))["avg"] or 0
-        )
-
-        context["total_revenue"] = (
-            Payment.objects.filter(status="paid")
-            .aggregate(total=Sum("amount"))["total"] or 0
-        )
-
+        # ------------------------------------------------------------
+        # 2. Datos por usuario (NO cacheados)
+        # ------------------------------------------------------------
         if user.is_academy:
             context["my_courses"] = Course.objects.filter(academy__owner=user)
             context["my_enrollments"] = Enrollment.objects.filter(

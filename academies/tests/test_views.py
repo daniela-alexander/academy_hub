@@ -2,7 +2,7 @@ from core.test_base import VerboseTestCase
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from academies.models import Academy, AcademyFavorite
-
+from django.core.cache import cache
 
 User = get_user_model()
 
@@ -210,3 +210,46 @@ class AcademyFavoriteTests(VerboseTestCase):
                 academy=self.academy,
             ).exists()
         )
+
+class AcademyFavoriteCacheInvalidationTests(VerboseTestCase):
+
+    def setUp(self):
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        cache.clear()
+        self.owner = User.objects.create_user(
+            username="englishnow",
+            email="info@englishnow.com",
+            password="TestPassword123!",
+            is_academy=True,
+        )
+        self.student = User.objects.create_user(
+            username="laura",
+            email="laura@example.com",
+            password="TestPassword123!",
+            is_student=True,
+        )
+        self.academy = Academy.objects.create(
+            owner=self.owner,
+            name="English Now",
+            slug="english-now",
+        )
+
+    def tearDown(self):
+        cache.clear()
+
+    def test_toggle_favorite_invalidates_popular_cache(self):
+        from django.core.cache import cache
+        from academies.cache import POPULAR_ACADEMIES_KEY
+
+        # Preparar cache con datos
+        cache.set(POPULAR_ACADEMIES_KEY, [99, 100], timeout=60)
+
+        # Toggle favorito
+        self.client.force_login(self.student)
+        self.client.post(
+            reverse("academies:toggle_favorite", kwargs={"slug": "english-now"}),
+        )
+
+        # El cache debe haberse invalidado
+        self.assertIsNone(cache.get(POPULAR_ACADEMIES_KEY))

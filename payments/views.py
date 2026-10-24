@@ -17,6 +17,7 @@ from django.views.generic import (
 
 from .forms import DiscountForm, PaymentForm, ScholarshipForm
 from .models import Discount, Payment, Scholarship
+from dashboard.cache import invalidate_global_stats
 
 logger = logging.getLogger(__name__)
 
@@ -217,6 +218,7 @@ class PaymentCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         response = super().form_valid(form)
+        invalidate_global_stats()
         messages.success(self.request, "Pago registrado.")
         logger.info("Payment created: id=%s", self.object.pk)
         return response

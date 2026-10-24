@@ -64,6 +64,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    "accounts.middleware.UserPresenceMiddleware",
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -242,3 +243,19 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
+
+# ============================================================
+# REDIS / CACHE
+# ============================================================
+
+
+REDIS_URL = os.getenv("REDIS_URL", "redis://127.0.0.1:6379/0")
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": REDIS_URL,
+        "TIMEOUT": 300,
+        "KEY_PREFIX": "academyhub",
+    }
+}

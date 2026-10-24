@@ -17,12 +17,22 @@ from django.views.generic import (
 
 from .forms import ContactMessageForm
 from .models import ContactMessage
-
+from courses.cache import get_popular_courses
+from academies.cache import get_popular_academies
 
 logger = logging.getLogger(__name__)
 
 def home(request):
-    return render(request, "core/home.html")
+    popular_courses = get_popular_courses()
+    popular_academies = get_popular_academies()
+    return render(
+        request,
+        "core/home.html",
+        {
+            "popular_courses": popular_courses,
+            "popular_academies": popular_academies,
+        },
+    )
 
 def about(request):
     return render(request, "core/about.html")

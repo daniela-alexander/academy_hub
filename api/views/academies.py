@@ -13,6 +13,7 @@ from api.permissions import (
 from api.serializers.academies import AcademySerializer, TeacherSerializer
 from api.serializers.courses import CourseSerializer
 
+from academies.cache import invalidate_popular_academies
 
 class AcademyViewSet(viewsets.ModelViewSet):
     serializer_class = AcademySerializer
@@ -83,6 +84,9 @@ class AcademyViewSet(viewsets.ModelViewSet):
             user=request.user,
             academy=academy,
         )
+
+        # Invalidar cache igual que en la vista web
+        invalidate_popular_academies()
 
         if created:
             return Response({"favorited": True}, status=201)

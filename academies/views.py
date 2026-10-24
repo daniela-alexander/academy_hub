@@ -23,6 +23,8 @@ from django.views.generic import (
 from .forms import AcademyForm, TeacherForm
 from .models import Academy, AcademyFavorite, Teacher
 
+from academies.cache import invalidate_popular_academies
+
 logger = logging.getLogger(__name__)
 
 
@@ -219,6 +221,9 @@ def toggle_academy_favorite(request, slug):
             messages.info(request, "Academia eliminada de favoritos.")
         else:
             messages.success(request, "Academia añadida a favoritos.")
+
+    # Invalidar cache de academias populares
+    invalidate_popular_academies()
 
     return redirect(next_url)
 

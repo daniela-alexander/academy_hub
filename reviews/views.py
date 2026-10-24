@@ -5,12 +5,14 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, DeleteView, ListView, UpdateView
-
+from core.rate_limit import check_rate_limit
 from academies.models import Academy
 from courses.models import Course
 
 from .forms import AcademyReviewForm, CourseReviewForm
 from .models import AcademyReview, CourseReview
+
+from dashboard.cache import invalidate_global_stats
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +31,14 @@ class CourseReviewCreateView(StudentRequiredMixin, CreateView):
         return get_object_or_404(Course, pk=self.kwargs["course_pk"])
 
     def form_valid(self, form):
+        rate_key = f"academyhub:rate:reviews:{self.request.user.pk}"
+
+        if not check_rate_limit(rate_key, limit=10, window=60):
+            messages.error(
+                self.request,
+                "Has enviado demasiadas reseñas. Inténtalo más tarde.",
+            )
+            return self.form_invalid(form)
         course = self.get_course()
 
         existing = CourseReview.objects.filter(
@@ -46,6 +56,7 @@ class CourseReviewCreateView(StudentRequiredMixin, CreateView):
         form.instance.student = self.request.user
         form.instance.course = course
         response = super().form_valid(form)
+        invalidate_global_stats()
         messages.success(self.request, "Valoración publicada.")
         logger.info(
             "CourseReview created: id=%s student=%s",

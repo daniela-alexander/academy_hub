@@ -7,6 +7,10 @@ from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.contrib import messages
+from dashboard.cache import invalidate_global_stats
+from courses.redis_services import increment_course_views
+
+
 from django.contrib.auth.mixins import (
     LoginRequiredMixin,
     UserPassesTestMixin,
@@ -36,6 +40,9 @@ from .models import (
     CourseModality,
     CourseStatus,
 )
+
+from courses.cache import invalidate_popular_courses
+
 
 logger = logging.getLogger(__name__)
 
@@ -178,7 +185,7 @@ class CourseCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
                     is_primary=(position == 0),
                     position=position,
                 )
-
+        invalidate_global_stats()
         messages.success(self.request, "Curso publicado correctamente.")
         logger.info(
             "Course created: id=%s user=%s",
@@ -223,6 +230,8 @@ def toggle_course_favorite(request, pk):
         else:
             messages.success(request, "Curso añadido a favoritos.")
 
+    invalidate_popular_courses()
+    
     return redirect(next_url)
 
 
@@ -266,6 +275,7 @@ class CourseDetailView(DetailView):
             views_count=F("views_count") + 1
         )
         course.refresh_from_db(fields=["views_count"])
+        increment_course_views(course.pk)
         return course
     
     def get_context_data(self, **kwargs):
@@ -291,7 +301,6 @@ class CourseDetailView(DetailView):
             min_price=Min("price"),
             max_price=Max("price"),
         )
-
 
         return context
 

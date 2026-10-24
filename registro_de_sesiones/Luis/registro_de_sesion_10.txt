@@ -1,0 +1,88 @@
+PROYECTO: Academy Hub
+SESIÓN: 10
+FASE: Comunicación e infraestructura
+TEMA: Redis, cache, TTL, presencia y contadores
+FECHA: 24/10/2026
+HORA DE ENTRADA: 20h
+HORA DE SALIDA: 21:15h
+DURACIÓN: 1hora 15minutos
+
+RESPONSABLE: Luis Robert Huertas Araya
+
+OBJETIVO:
+Integrar Redis en Academy Hub para datos rápidos, temporales y efímeros.
+
+TEORÍA:
+- Redis
+- Key-value
+- In-memory
+- Cache
+- TTL
+- Cache hit / miss
+- Cache invalidation
+- Cache-aside
+- INCR
+- Operaciones atómicas
+- Rate limiting
+- Presence
+- Middleware
+
+TECNOLOGÍAS:
+- Redis
+- redis-py
+- Django Cache
+- PostgreSQL
+- Django
+
+FUNCIONALIDADES:
+- Redis conectado
+- Cache Django
+- Cursos populares cacheados
+- Invalidación de cache
+- Contadores rápidos
+- Presencia online
+- Last seen
+- Middleware de presencia
+- Rate limit
+- Preparación para Channels y Celery
+
+ARCHIVOS CREADOS:
+core/redis.py
+core/rate_limit.py
+accounts/presence.py
+accounts/middleware.py
+courses/cache.py
+courses/redis_services.py
+dashboard/cache.py
+courses/tests/test_cache.py
+accounts/tests/test_presence.py
+core/tests/test_rate_limit.py
+
+ARCHIVOS MODIFICADOS:
+.env
+.env.example
+requirements.txt
+config/settings/base.py
+config/settings/testing.py
+core/views.py
+courses/views.py
+accounts/views.py
+dashboard/views.py
+
+TESTS:
+- cache set/get
+- invalidación
+- presencia
+- rate limiting
+
+COMMIT:
+feat: add Redis caching presence counters and rate limiting
+
+ESTADO:
+[ ] Pendiente
+[ ] En progreso
+[X] Completada
+
+SIGUIENTE SESIÓN:
+Chat en tiempo real con ASGI, Django Channels, WebSockets, Consumers,
+Groups, Redis Channel Layer y mensajes en tiempo real.
