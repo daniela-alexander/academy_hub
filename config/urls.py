@@ -40,6 +40,7 @@ urlpatterns = [
     path("level-tests/", include("level_tests.urls")),
     path("search/", include("search.urls")),
     path("dashboard/", include("dashboard.urls")),
+    path("chat/", include("chat.urls")),
     # API REST v1
     path("api/v1/", include("api.urls")),
 
@@ -55,6 +56,7 @@ urlpatterns = [
         SpectacularRedocView.as_view(url_name="schema"),
         name="redoc",
     ),
+
 ]
 
 
