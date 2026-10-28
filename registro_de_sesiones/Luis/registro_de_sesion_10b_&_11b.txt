@@ -1,0 +1,49 @@
+PROYECTO: Academy Hub
+SESIÓN: 10B + 11B
+FASE: Comunicación, notificaciones y tareas asíncronas
+TEMA: Chat (REST + WebSockets), notificaciones por señales, Celery
+FECHA: 24/10/2026
+HORA DE ENTRADA: 17h
+HORA DE SALIDA: 17:49h
+DURACIÓN: 49minutos
+
+RESPONSABLE: Luis Robert Huertas Araya
+
+OBJETIVO:
+- Implementar chat entre alumno↔profesor, academia↔alumno, academia↔profesor,
+  con soporte de grupos, en tiempo real (WebSockets) y por API REST.
+- Añadir Celery con Redis como broker para tareas asíncronas.
+- Desacoplar notificaciones de vistas mediante señales Django.
+
+TEORÍA:
+- Django Channels
+- Channel Layer con Redis
+- ASGI
+- WebSockets
+- Consumers
+- Signals (pre_save, post_save)
+- Celery (shared_task, broker, worker)
+- Redis como broker
+- Transacciones atómicas y select_for_update
+
+APPS TOCADAS:
+- chat (nueva)
+- notifications (ampliada)
+- config (settings, asgi, celery)
+- api (router)
+- templates y static
+
+TESTS:
+- chat: modelos, servicios, vistas web, API
+- notifications: tareas, señales
+
+COMMIT:
+feat: add real-time chat, notifications via signals and Celery tasks
+
+ESTADO:
+[ ] Pendiente
+[ ] En progreso
+[ ] Completada
+
+SIGUIENTE SESIÓN:
+Sesión 12 — (según PDF)

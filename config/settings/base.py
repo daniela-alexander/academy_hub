@@ -31,7 +31,9 @@ THIRD_PARTY_APPS = [
     "django_filters",
     "drf_spectacular",
     "corsheaders",
+    "channels",
 ]
+
 
 
 LOCAL_APPS = [
@@ -49,7 +51,9 @@ LOCAL_APPS = [
     "search",
     "dashboard",
     "api",
+    "chat",
 ]
+
 
 INSTALLED_APPS = (
     *DJANGO_APPS,
@@ -87,6 +91,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'config.wsgi.application'
+ASGI_APPLICATION = "config.asgi.application"
+
 
 
 # Database
@@ -259,3 +265,42 @@ CACHES = {
         "KEY_PREFIX": "academyhub",
     }
 }
+
+# ============================================================
+# CHANNELS / WEBSOCKETS
+# ============================================================
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [
+                os.getenv(
+                    "CHANNELS_REDIS_URL",
+                    os.getenv("REDIS_URL", "redis://127.0.0.1:6379/0"),
+                )
+            ],
+        },
+    },
+}
+
+
+# ============================================================
+# CELERY
+# ============================================================
+
+CELERY_BROKER_URL = os.getenv(
+    "CELERY_BROKER_URL",
+    os.getenv("REDIS_URL", "redis://127.0.0.1:6379/0"),
+)
+
+CELERY_RESULT_BACKEND = os.getenv(
+    "CELERY_RESULT_BACKEND",
+    os.getenv("REDIS_URL", "redis://127.0.0.1:6379/0"),
+)
+
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = TIME_ZONE
+

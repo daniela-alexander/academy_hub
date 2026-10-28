@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ conversation.display_title }} | Academy Hub
+{% endblock %}
+
+{% block content %}
+
+<h1>{{ conversation.display_title }}</h1>
+
+{% if conversation.course %}
+    <p>
+        Curso:
+        <a href="{{ conversation.course.get_absolute_url }}">
+            {{ conversation.course.title }}
+        </a>
+    </p>
+{% endif %}
+
+<p>
+    Participantes:
+    {% for p in conversation.participants.all %}
+        {{ p.user.username }} ({{ p.get_role_display }}){% if not forloop.last %}, {% endif %}
+    {% endfor %}
+</p>
+
+<hr>
+
+<div id="chat-root" data-conversation-id="{{ conversation.pk }}">
+
+    <div id="messages-list">
+        {% for message in messages %}
+            <article>
+                <p>
+                    <strong>{{ message.sender.username }}</strong>
+                    — {{ message.created_at }}
+                </p>
+                <p>{{ message.text }}</p>
+            </article>
+            <hr>
+        {% empty %}
+            <p>Todavía no hay mensajes.</p>
+        {% endfor %}
+    </div>
+
+    <form id="message-form" method="post" action="{% url 'chat:detail' conversation.pk %}">
+        {% csrf_token %}
+        <textarea id="message-text" name="text" rows="2" placeholder="Escribe un mensaje..."></textarea>
+        <button type="submit">Enviar</button>
+    </form>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/chat/js/chat.js"></script>
+{% endblock %}

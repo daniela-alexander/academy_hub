@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}
+Crear grupo | Academy Hub
+{% endblock %}
+
+{% block content %}
+
+<h1>Crear grupo</h1>
+
+<form method="post">
+    {% csrf_token %}
+
+    <p>
+        <label>Título</label>
+        <input type="text" name="title" required maxlength="150">
+    </p>
+
+    <p>
+        <label>Usuarios (uno por línea)</label>
+        <textarea name="participants" rows="6"
+            placeholder="laura&#10;carlos&#10;ana"></textarea>
+    </p>
+
+    <button type="submit">Crear grupo</button>
+</form>
+
+{% endblock %}

@@ -1,6 +1,8 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
+from chat.views import ConversationViewSet
+
 from api.views.accounts import UserViewSet
 from api.views.academies import AcademyViewSet, TeacherViewSet
 from api.views.auth import (
@@ -62,6 +64,7 @@ router.register("competences", CompetenceViewSet, basename="competence")
 router.register("passport", TalentPassportViewSet, basename="passport")
 router.register("passport-entries", PassportEntryViewSet, basename="passport-entry")
 router.register("level-tests", LevelTestViewSet, basename="level-test")
+router.register("conversations", ConversationViewSet, basename="conversation")
 
 urlpatterns = [
     # Autenticación

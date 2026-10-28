@@ -22,3 +22,21 @@ CACHES = {
         "LOCATION": "academyhub-testing",
     }
 }
+
+# ============================================================
+# CHANNELS EN TESTING (in-memory, sin Redis)
+# ============================================================
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
+}
+
+
+# ============================================================
+# CELERY EN TESTING (eager, sin worker)
+# ============================================================
+
+CELERY_TASK_ALWAYS_EAGER = True
+CELERY_TASK_EAGER_PROPAGATES = True
