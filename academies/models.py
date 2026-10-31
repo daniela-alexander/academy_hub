@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.contrib.gis.db import models as gis_models
 from django.db import models
 from django.utils.text import slugify
 
@@ -93,6 +94,22 @@ class Academy(models.Model):
     updated_at = models.DateTimeField(
         auto_now=True,
         verbose_name="Última actualización",
+    )
+
+    location = gis_models.PointField(
+    srid=4326,
+    null=True,
+    blank=True,
+    geography=True,
+    verbose_name="Ubicación geográfica",
+    help_text="Coordenadas (latitud, longitud) de la sede principal.",
+    )
+
+    location_name = models.CharField(
+    max_length=150,
+    blank=True,
+    verbose_name="Nombre de la zona",
+    help_text="Ej: 'Hospitalet de Llobregat', 'Centro de Madrid'.",
     )
 
     class Meta:
