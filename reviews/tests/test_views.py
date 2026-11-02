@@ -67,6 +67,25 @@ class CourseReviewListTests(VerboseTestCase):
 
 
 
+    def test_invalid_rating_is_ignored(self):
+        response = self.client.get(
+            reverse("reviews:course_review_list"),
+            {"rating": "abc"},
+        )
+        self.assertContains(response, "Excelente")
+
+    def test_invalid_course_is_ignored(self):
+        response = self.client.get(
+            reverse("reviews:course_review_list"),
+            {"course": "abc"},
+        )
+        self.assertContains(response, "Excelente")
+
+    def test_my_reviews_invalid_rating_is_ignored(self):
+        self.client.force_login(self.student)
+        response = self.client.get(reverse("reviews:mine"), {"rating": "abc"})
+        self.assertContains(response, "5/5")
+
     def test_my_reviews_filter_by_rating(self):
         self.client.force_login(self.student)
 

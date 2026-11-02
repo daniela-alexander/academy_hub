@@ -5,6 +5,7 @@ from django.urls import reverse_lazy
 from django.core.paginator import Paginator
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
+from core.utils.query_params import parse_int
 from .forms import CompetenceForm, PassportEntryForm, TalentPassportForm
 from .models import Competence, TalentPassport
 from courses.models import Category
@@ -28,8 +29,8 @@ class CompetenceListView(StaffRequiredMixin, ListView):
         if query:
             queryset = queryset.filter(name__icontains=query)
 
-        category_id = self.request.GET.get("category")
-        if category_id:
+        category_id = parse_int(self.request.GET.get("category"))
+        if category_id is not None:
             queryset = queryset.filter(category_id=category_id)
 
         return queryset.order_by("name")

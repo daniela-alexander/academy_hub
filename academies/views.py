@@ -20,6 +20,7 @@ from django.views.generic import (
     UpdateView,
 )
 
+from core.utils.query_params import parse_int
 from .forms import AcademyForm, TeacherForm
 from .models import Academy, AcademyFavorite, Teacher
 
@@ -254,8 +255,8 @@ class TeacherListView(ListView):
                 | Q(specialty__icontains=query)
             )
 
-        academy_id = self.request.GET.get("academy")
-        if academy_id:
+        academy_id = parse_int(self.request.GET.get("academy"))
+        if academy_id is not None:
             queryset = queryset.filter(academy_id=academy_id)
 
         return queryset.order_by("last_name", "first_name")
