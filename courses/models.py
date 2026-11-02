@@ -405,7 +405,7 @@ class Convocatoria(models.Model):
         if self.is_full:
             return False
         if self.enrollment_deadline:
-            if timezone.now().date() > self.enrollment_deadline:
+            if timezone.localdate() > self.enrollment_deadline:
                 return False
         return True
 

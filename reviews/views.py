@@ -5,6 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, DeleteView, ListView, UpdateView
+from core.utils.query_params import parse_int
 from core.rate_limit import check_rate_limit
 from academies.models import Academy
 from courses.models import Course
@@ -157,8 +158,8 @@ class MyReviewListView(LoginRequiredMixin, ListView):
             .order_by("-created_at")
         )
 
-        rating = self.request.GET.get("rating")
-        if rating:
+        rating = parse_int(self.request.GET.get("rating"))
+        if rating is not None:
             queryset = queryset.filter(rating=rating)
 
         return queryset
@@ -182,12 +183,12 @@ class CourseReviewListView(ListView):
             .select_related("student", "course", "course__academy")
         )
 
-        course_id = self.request.GET.get("course")
-        if course_id:
+        course_id = parse_int(self.request.GET.get("course"))
+        if course_id is not None:
             queryset = queryset.filter(course_id=course_id)
 
-        rating = self.request.GET.get("rating")
-        if rating:
+        rating = parse_int(self.request.GET.get("rating"))
+        if rating is not None:
             queryset = queryset.filter(rating=rating)
 
         ordering = self.request.GET.get("ordering", "newest")

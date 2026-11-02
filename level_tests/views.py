@@ -9,6 +9,7 @@ from django.utils import timezone
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 from django.db.models import Q, Count
 
+from core.utils.query_params import parse_int
 from .forms import LevelTestAttemptForm, LevelTestForm
 from .models import LevelTest, LevelTestAttempt
 
@@ -36,8 +37,8 @@ class LevelTestListView(ListView):
             queryset = queryset.filter(
                 Q(title__icontains=query) | Q(description__icontains=query)
 )
-        course_id = self.request.GET.get("course")
-        if course_id:
+        course_id = parse_int(self.request.GET.get("course"))
+        if course_id is not None:
             queryset = queryset.filter(course_id=course_id)
 
         return queryset

@@ -28,3 +28,10 @@ class LevelTestSearchTests(VerboseTestCase):
             {"q": "inglés"},
         )
         self.assertEqual(response.status_code, 200)
+
+    def test_invalid_course_is_ignored(self):
+        response = self.client.get(
+            reverse("level_tests:list"),
+            {"course": "abc"},
+        )
+        self.assertEqual(response.status_code, 200)
