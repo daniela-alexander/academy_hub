@@ -27,6 +27,9 @@ class AcademySerializer(serializers.ModelSerializer):
     teachers_count = serializers.IntegerField(read_only=True)
     courses_count = serializers.IntegerField(read_only=True)
     favorite_count = serializers.IntegerField(read_only=True)
+    latitude = serializers.SerializerMethodField()
+    longitude = serializers.SerializerMethodField()
+    distance_km = serializers.SerializerMethodField()
 
     class Meta:
         model = Academy
@@ -48,6 +51,10 @@ class AcademySerializer(serializers.ModelSerializer):
             "teachers_count",
             "courses_count",
             "favorite_count",
+            "location_name",
+            "latitude",
+            "longitude",
+            "distance_km",
             "created_at",
             "updated_at",
         ]
@@ -57,6 +64,21 @@ class AcademySerializer(serializers.ModelSerializer):
             "slug",
             "views_count",
             "is_verified",
+            "location_name",
+            "latitude",
+            "longitude",
+            "distance_km",
             "created_at",
             "updated_at",
         ]
+
+    def get_latitude(self, obj) -> float | None:
+        return obj.location.y if obj.location else None
+
+    def get_longitude(self, obj) -> float | None:
+        return obj.location.x if obj.location else None
+
+    def get_distance_km(self, obj) -> float | None:
+        if hasattr(obj, "distance") and obj.distance is not None:
+            return round(obj.distance.km, 2)
+        return None

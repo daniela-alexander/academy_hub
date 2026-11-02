@@ -24,6 +24,7 @@ from .forms import AcademyForm, TeacherForm
 from .models import Academy, AcademyFavorite, Teacher
 
 from academies.cache import invalidate_popular_academies
+from core.geo_services import filter_within_radius, parse_geo_params
 
 logger = logging.getLogger(__name__)
 
@@ -62,6 +63,10 @@ class AcademyListView(ListView):
         city = self.request.GET.get("city")
         if city:
             queryset = queryset.filter(city__icontains=city)
+
+        geo = parse_geo_params(self.request.GET)
+        if geo:
+            return filter_within_radius(queryset, "location", *geo)
 
         ordering_map = {
             "newest": "-created_at",

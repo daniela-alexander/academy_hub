@@ -6,12 +6,14 @@ from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied
 
 from api.filters.courses import CourseFilter
+from api.mixins import DistanceOrderingMixin
 from api.permissions import IsCourseAcademyOwnerOrReadOnly
 from api.serializers.courses import (
     CategorySerializer,
     CourseFavoriteSerializer,
     CourseSerializer,
 )
+from core.geo_services import filter_within_radius, parse_geo_params
 from courses.models import Category, Course, CourseFavorite
 from courses.services import archive_course
 
@@ -24,7 +26,7 @@ class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
         return Category.objects.filter(is_active=True).order_by("name")
 
 
-class CourseViewSet(viewsets.ModelViewSet):
+class CourseViewSet(DistanceOrderingMixin, viewsets.ModelViewSet):
     serializer_class = CourseSerializer
     permission_classes = [IsCourseAcademyOwnerOrReadOnly]
     filterset_class = CourseFilter
@@ -47,7 +49,7 @@ class CourseViewSet(viewsets.ModelViewSet):
     lookup_field = "pk"
 
     def get_queryset(self):
-        return (
+        queryset = (
             Course.objects
             .filter(status="published")
             .select_related("academy", "category", "teacher")
@@ -57,6 +59,12 @@ class CourseViewSet(viewsets.ModelViewSet):
                 reviews_avg=Avg("reviews__rating"),
             )
         )
+
+        geo = parse_geo_params(self.request.query_params)
+        if geo:
+            return filter_within_radius(queryset, "academy__location", *geo)
+
+        return queryset.order_by("-created_at")
 
     def perform_create(self, serializer):
         if not self.request.user.is_academy:

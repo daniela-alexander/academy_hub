@@ -69,6 +69,9 @@ class CourseSerializer(serializers.ModelSerializer):
     images = CourseImageSerializer(many=True, read_only=True)
     favorite_count = serializers.IntegerField(read_only=True)
     reviews_avg = serializers.FloatField(read_only=True)
+    latitude = serializers.SerializerMethodField()
+    longitude = serializers.SerializerMethodField()
+    distance_km = serializers.SerializerMethodField()
 
     class Meta:
         model = Course
@@ -100,6 +103,9 @@ class CourseSerializer(serializers.ModelSerializer):
             "favorite_count",
             "reviews_avg",
             "images",
+            "latitude",
+            "longitude",
+            "distance_km",
             "created_at",
             "updated_at",
         ]
@@ -108,9 +114,25 @@ class CourseSerializer(serializers.ModelSerializer):
             "slug",
             "status",
             "views_count",
+            "latitude",
+            "longitude",
+            "distance_km",
             "created_at",
             "updated_at",
         ]
+
+    def get_latitude(self, obj) -> float | None:
+        location = obj.academy.location
+        return location.y if location else None
+
+    def get_longitude(self, obj) -> float | None:
+        location = obj.academy.location
+        return location.x if location else None
+
+    def get_distance_km(self, obj) -> float | None:
+        if hasattr(obj, "distance") and obj.distance is not None:
+            return round(obj.distance.km, 2)
+        return None
 
 
 class CourseFavoriteSerializer(serializers.ModelSerializer):
