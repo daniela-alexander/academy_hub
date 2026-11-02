@@ -1,0 +1,67 @@
+PROYECTO: Academy Hub
+SESIÓN: 12B (puntos 8 a 14)
+FASE: Datos avanzados y geolocalización
+TEMA: PostGIS, GeoDjango y búsquedas por proximidad
+FECHA: 02/11/2026
+
+RESPONSABLE: Marga Mbande
+
+OBJETIVO:
+- Exponer la geolocalización en la API y en la web.
+- Implementar búsquedas por proximidad en ViewSets, vistas y plantillas.
+- Tests geoespaciales.
+
+TEORÍA:
+- PostGIS
+- GeoDjango
+- PointField
+- SRID 4326
+- geography=True
+- Distance
+- D(km=...)
+- distance_lte
+
+SERVICIOS:
+- core/geo_services.py: parse_geo_params, filter_within_radius
+
+API:
+- GET /api/v1/academies/?lat=&lng=&distance_km=
+- GET /api/v1/courses/?lat=&lng=&distance_km=
+
+WEB:
+- /academies/?lat=&lng=&distance_km=
+- /courses/?lat=&lng=&distance_km=
+
+TESTS:
+- academies/tests/test_geo.py
+- courses/tests/test_geo.py
+- api/tests/test_geo.py
+
+ADAPTACIONES RESPECTO AL DOCUMENTO:
+- La lógica del filtro se centraliza en core/geo_services.py en lugar de repetirla en cada vista.
+- Se validan lat, lng y distance_km: los valores no válidos se ignoran.
+- api/mixins.py conserva el orden por distancia, que OrderingFilter anularía.
+
+ARCHIVOS CREADOS:
+api/mixins.py
+api/tests/test_geo.py
+academies/tests/test_geo.py
+courses/tests/test_geo.py
+registro_de_sesiones/Marga/registro_de_sesion_12b.txt
+
+ARCHIVOS MODIFICADOS:
+core/geo_services.py
+api/serializers/academies.py
+api/serializers/courses.py
+api/views/academies.py
+api/views/courses.py
+academies/views.py
+courses/views.py
+templates/courses/course_list.html
+templates/academies/academy_list.html
+
+COMMIT:
+feat: expose geolocation in API and web lists
+
+ESTADO:
+[x] Completada

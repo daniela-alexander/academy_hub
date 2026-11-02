@@ -9,6 +9,7 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.contrib import messages
 from dashboard.cache import invalidate_global_stats
 from courses.redis_services import increment_course_views
+from core.geo_services import filter_within_radius, parse_geo_params
 
 
 from django.contrib.auth.mixins import (
@@ -111,6 +112,10 @@ class CourseListView(ListView):
                 convocatorias__price__lte=max_price,
                 convocatorias__is_active=True,
             )
+
+        geo = parse_geo_params(self.request.GET)
+        if geo:
+            return filter_within_radius(queryset, "academy__location", *geo).distinct()
 
         ordering_map = {
             "newest": "-created_at",

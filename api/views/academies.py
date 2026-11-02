@@ -14,8 +14,10 @@ from api.serializers.academies import AcademySerializer, TeacherSerializer
 from api.serializers.courses import CourseSerializer
 
 from academies.cache import invalidate_popular_academies
+from api.mixins import DistanceOrderingMixin
+from core.geo_services import filter_within_radius, parse_geo_params
 
-class AcademyViewSet(viewsets.ModelViewSet):
+class AcademyViewSet(DistanceOrderingMixin, viewsets.ModelViewSet):
     serializer_class = AcademySerializer
     permission_classes = [IsAcademyOwnerOrReadOnly]
     filterset_class = AcademyFilter
@@ -25,7 +27,7 @@ class AcademyViewSet(viewsets.ModelViewSet):
     lookup_field = "slug"
 
     def get_queryset(self):
-        return (
+        queryset = (
             Academy.objects
             .filter(is_active=True)
             .select_related("owner")
@@ -34,8 +36,13 @@ class AcademyViewSet(viewsets.ModelViewSet):
                 courses_count=Count("courses", distinct=True),
                 favorite_count=Count("favorites", distinct=True),
             )
-            .order_by("-created_at")
         )
+
+        geo = parse_geo_params(self.request.query_params)
+        if geo:
+            return filter_within_radius(queryset, "location", *geo)
+
+        return queryset.order_by("-created_at")
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)

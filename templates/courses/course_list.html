@@ -80,6 +80,27 @@ Cursos | Academy Hub
         </select>
     </p>
 
+    <fieldset>
+        <legend>Buscar cerca de mí</legend>
+        <p>
+            <label for="id_lat">Latitud</label>
+            <input type="number" id="id_lat" name="lat" step="0.0001" min="-90" max="90"
+                   value="{{ request.GET.lat }}"
+                   placeholder="Ej: 41.3870">
+        </p>
+        <p>
+            <label for="id_lng">Longitud</label>
+            <input type="number" id="id_lng" name="lng" step="0.0001" min="-180" max="180"
+                   value="{{ request.GET.lng }}"
+                   placeholder="Ej: 2.1700">
+        </p>
+        <p>
+            <label for="id_distance_km">Distancia (km)</label>
+            <input type="number" id="id_distance_km" name="distance_km" min="1" max="500"
+                   value="{{ request.GET.distance_km|default:'20' }}">
+        </p>
+    </fieldset>
+
     <button type="submit">Buscar y filtrar</button>
 
     <a href="{% url 'courses:list' %}">Limpiar filtros</a>
