@@ -369,6 +369,18 @@ class AcademyEnrollmentListTests(VerboseTestCase):
         )
         self.assertEqual(response.status_code, 200)
 
+    def test_invalid_course_is_ignored(self):
+        Enrollment.objects.create(
+            student=self.student,
+            convocatoria=self.convocatoria,
+        )
+        self.client.force_login(self.academy_user)
+        response = self.client.get(
+            reverse("enrollments:academy_list"),
+            {"course": "abc"},
+        )
+        self.assertContains(response, "laura")
+
     def test_academy_enrollments_paginadas(self):
         self.client.force_login(self.academy_user)
 

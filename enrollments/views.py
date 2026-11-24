@@ -19,6 +19,7 @@ from django.views.generic import (
 
 from courses.models import Course
 from core.rate_limit import check_rate_limit
+from core.utils.query_params import parse_int
 from .models import Enrollment, EnrollmentStatus
 
 from courses.models import Convocatoria
@@ -205,8 +206,8 @@ class AcademyEnrollmentListView(LoginRequiredMixin, UserPassesTestMixin, ListVie
         if status:
             queryset = queryset.filter(status=status)
 
-        course_id = self.request.GET.get("course")
-        if course_id:
+        course_id = parse_int(self.request.GET.get("course"))
+        if course_id is not None:
             queryset = queryset.filter(convocatoria__course_id=course_id)
 
         return queryset

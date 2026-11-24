@@ -12,6 +12,15 @@ class SearchTests(VerboseTestCase):
         self.assertEqual(response.status_code, 200)
 
 
+class CourseSearchFilterTests(VerboseTestCase):
+    def test_invalid_category_is_ignored(self):
+        response = self.client.get(
+            reverse("search:course_search"),
+            {"category": "abc"},
+        )
+        self.assertEqual(response.status_code, 200)
+
+
 class GlobalSearchTests(VerboseTestCase):
 
     def setUp(self):

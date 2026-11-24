@@ -30,6 +30,23 @@ class PassportTests(VerboseTestCase):
         self.assertEqual(response.status_code, 403)
 
 
+class CompetenceFilterTests(VerboseTestCase):
+    def test_invalid_category_is_ignored(self):
+        staff = User.objects.create_user(
+            username="admin",
+            email="admin@example.com",
+            password="testpass123",
+            is_staff=True,
+        )
+        Competence.objects.create(name="Python")
+        self.client.force_login(staff)
+        response = self.client.get(
+            reverse("talent:competence_list"),
+            {"category": "abc"},
+        )
+        self.assertContains(response, "Python")
+
+
 def test_passport_entries_paginated(self):
     self.client.force_login(self.student)
     passport, _ = TalentPassport.objects.get_or_create(student=self.student)

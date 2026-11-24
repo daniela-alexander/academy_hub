@@ -2,6 +2,7 @@ from django.db.models import Min, Q
 from django.views.generic import ListView
 
 from academies.models import Academy, Teacher
+from core.utils.query_params import parse_int
 from courses.models import Category, Course, CourseLevel, CourseModality, CourseStatus
 from academies.models import Teacher, Academy
 
@@ -25,8 +26,8 @@ class CourseSearchView(ListView):
                 | Q(academy__name__icontains=q)
             )
 
-        category = self.request.GET.get("category")
-        if category:
+        category = parse_int(self.request.GET.get("category"))
+        if category is not None:
             queryset = queryset.filter(category_id=category)
 
         level = self.request.GET.get("level")

@@ -1,4 +1,6 @@
+from datetime import date, datetime, timezone as dt_timezone
 from decimal import Decimal
+from unittest import mock
 from core.test_base import VerboseTestCase
 
 from django.contrib.auth import get_user_model
@@ -476,3 +478,26 @@ class CourseConstraintTests(VerboseTestCase):
         with self.assertRaises(IntegrityError):
             with transaction.atomic():
                 CourseFavorite.objects.create(user=student, course=course)
+
+
+class ConvocatoriaDeadlineTests(VerboseTestCase):
+    """La fecha límite se evalúa en hora local (Europe/Madrid), no en UTC."""
+
+    def _is_open_at(self, utc_now):
+        convocatoria = Convocatoria(
+            is_active=True,
+            total_places=10,
+            enrollment_deadline=date(2026, 7, 15),
+        )
+        with mock.patch("django.utils.timezone.now", return_value=utc_now):
+            return convocatoria.is_open
+
+    def test_closed_after_local_midnight(self):
+        # 22:30 UTC del día 15 son las 00:30 del día 16 en Madrid.
+        utc_now = datetime(2026, 7, 15, 22, 30, tzinfo=dt_timezone.utc)
+        self.assertFalse(self._is_open_at(utc_now))
+
+    def test_open_until_local_midnight(self):
+        # 21:30 UTC del día 15 son las 23:30 del día 15 en Madrid.
+        utc_now = datetime(2026, 7, 15, 21, 30, tzinfo=dt_timezone.utc)
+        self.assertTrue(self._is_open_at(utc_now))

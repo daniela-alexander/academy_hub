@@ -1,10 +1,11 @@
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
-from django.test import TestCase
+from django.test import RequestFactory, TestCase
 from django.urls import reverse
 
 from academies.cache import POPULAR_ACADEMIES_KEY
 from academies.models import Academy, AcademyFavorite
+from academies.views import TeacherListView
 
 User = get_user_model()
 
@@ -96,6 +97,16 @@ class AcademySearchTests(TestCase):
         )
         self.assertContains(response, "Code Academy")
         self.assertNotContains(response, "English Now")
+
+
+class TeacherFilterTests(TestCase):
+
+    def test_invalid_academy_is_ignored(self):
+        # Se llama a la vista directamente: la URL /academies/teachers/ la
+        # captura antes la ruta <slug:slug>/.
+        request = RequestFactory().get("/", {"academy": "abc"})
+        response = TeacherListView.as_view()(request)
+        self.assertEqual(response.status_code, 200)
 
 
 class AcademyFavoriteTests(TestCase):
